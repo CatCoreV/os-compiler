@@ -21,3 +21,4 @@ vulkan-1.dll
 lib/
 chrome_crashpad_handler
 nw
+nw.app/
