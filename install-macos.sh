@@ -9,7 +9,7 @@ case "$ARCH" in
     NWJS_ARCH="x64"
     echo "Detected: MacOS (x64)"
     ;;
-  arm64)
+  aarch64|arm64)
     NWJS_ARCH="arm64"
     echo "Detected: MacOS (ARM64)"
     ;;
