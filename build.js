@@ -347,7 +347,11 @@ async function compile() {
           "cwd": path.join(process.cwd(), "dist")
         }, res));
       }
-      fs.chmodSync(path.join(process.cwd(), "dist", `${name}.app`), "0777");
+      if (process.platform != "win32") {
+        await new Promise(res => child_process.exec(`chmod -R 777 ${name}.app`, {
+          "cwd": path.join(process.cwd(), "dist")
+        }, res));
+      }
     }
   }
 
