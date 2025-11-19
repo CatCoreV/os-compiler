@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CatCore SDK</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fa.css" rel="stylesheet" type="text/css" media="print" onload="this.media='all'">
+<style>
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("./font.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+#titlebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 90px);
+  height: 30px;
+  -webkit-app-region: drag;
+  z-index: 1;
+}
+
+#minimize {
+  position: fixed;
+  top: -5px;
+  right: 48px;
+  background: rgba(0, 255, 255, .3);
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#close {
+  position: fixed;
+  top: -5px;
+  right: 10px;
+  background: rgba(255, 0, 0, .3);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+body {
+  margin: 0;
+  color: #fff;
+  font-family: 'Fredoka', sans-serif;
+  background-color: #202020;
+  height: 100vh;
+  user-select: none;
+}
+
+.logo {
+  padding: 2px 5px;
+  color: #faa81a;
+  background-color: #615e5ea8;
+  border-radius: 4px;
+  font-size: 50px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.text {
+  margin: 10px;
+  padding: 2px 5px;
+  color: #faa81a;
+  background-color: #615e5ea8;
+  border-radius: 4px;
+  font-size: 22px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.compile {
+  width: 310px;
+  background-color: #5865f2;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  padding: 8px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin: 8px 5px;
+  font-weight: 600;
+  font-family: Fredoka,sans-serif;
+  cursor: pointer;
+}
+
+.compile.disabled {
+  cursor: not-allowed;
+  background-color: #3d4388;
+}
+
+.square {
+  background-color: #333333;
+  width: 147px;
+  height: 140px;
+  display: inline-block;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.arrow {
+  position: relative;
+  bottom: 48px;
+}
+
+.update {
+  background-color: #5865f2;
+  padding: 5px;
+  border-radius: 3px;
+  position: relative;
+  top: 1px;
+  margin-left: 2px;
+  cursor: pointer;
+}
+
+.stepicon {
+  font-size: 30px;
+}
+
+.input {
+  border-radius: 5px;
+  border: 0;
+  padding: 3px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 14px;
+}
+
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .7);
+}
+
+#modal {
+  width: 300px;
+  height: 210px;
+  background-color: #202020;
+  border-radius: 4px;
+}
+</style>
+<script src="build.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  if (typeof nw === "undefined") {
+    document.body.innerHTML = `<center>
+<br><br><br><br><br><br><br><br><br><br><br><br>
+<a style="width: 850px;background-color: #615e5ea8;display: inline-block;border: none;border-radius: 4px;font-weight: 600;font-size: 25px;color: #faa81a;text-decoration: none;user-select: none;padding: 10px;">To open CatCore OS compiler, you instead want to open <code>catcore_compiler.exe/catcore_compiler/catcore_compiler.app</code><br>depending on your OS.</a>
+</center>`;
+  }
+});
+</script>
+</head>
+<body>
+</body>
+</html>

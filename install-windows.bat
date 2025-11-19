@@ -25,6 +25,8 @@ if errorlevel 1 (
 
 echo Extracting %OUTPUT%...
 tar -xf %OUTPUT%
+del /F /Q %OUTPUT%
+ren nw.exe catcore_compiler.exe
 
 if errorlevel 1 (
   echo ERROR: Extraction failed

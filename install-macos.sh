@@ -32,3 +32,6 @@ fi
 
 echo "Extracting $OUTPUT..."
 unzip "$OUTPUT"
+rm -f $OUTPUT
+mv nw.app catcore_compiler.app
+xattr -cr catcore_compiler.app

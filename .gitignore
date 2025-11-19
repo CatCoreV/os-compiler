@@ -22,3 +22,15 @@ lib/
 chrome_crashpad_handler
 nw
 nw.app/
+catcore_compiler.exe
+catcore_compiler
+catcore_compiler.app/
+pnacl/
+chromedriver.exe
+nacl_irt_x86_64.nexe
+nwjc.exe
+config.json
+src/
+platforms/
+dist/
+kernel-local
