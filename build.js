@@ -153,7 +153,8 @@ async function compile() {
   }
   var dist = path.join(process.cwd(), "dist");
   if (config.target == "macos-app") {
-    dist = path.join(dist, `${name}.app`, "Contents", "Resources");
+    dist = path.join(dist, `${name}.app`, "Contents", "Resources", "nw.app");
+    fs.mkdirSync(dist);
   }
 
   var loader = `        <div class="mt-48" id="loader">
@@ -329,16 +330,24 @@ async function compile() {
     try {
       fs.unlinkSync(path.join(dist, "system", "system.json"));
     } catch {}
-    fs.mkdirSync(path.join(dist, "fs", "boot"), {
+    fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "boot"), {
       "recursive": true
     });
     if (config.kernel.startsWith(".")) {
-      fs.copyFileSync(config.kernel, path.join(dist, "fs", "boot", "kernel"));
+      fs.copyFileSync(config.kernel, path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
     } else {
       try {
         fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel}-${config.arch}`).then(res => res.arrayBuffer())));
       } catch {}
-      fs.copyFileSync("kernel-cache", path.join(dist, "fs", "boot", "kernel"));
+      fs.copyFileSync("kernel-cache", path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
+    }
+    if (config.target == "macos-app") {
+      if (process.platform == "darwin") {
+        await new Promise(res => child_process.exec("xattr -cr System.app", {
+          "cwd": path.join(process.cwd(), "dist")
+        }, res));
+      }
+      fs.chmodSync(path.join(process.cwd(), "dist", "System.app"), "0o777");
     }
   }
 
