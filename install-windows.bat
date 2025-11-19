@@ -13,12 +13,11 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
   exit /b 1
 )
 
-set VERSION=0.77.0
-set URL=https://dl.node-webkit.org/v%VERSION%/nwjs-v%VERSION%-win-%ARCH%.zip
+set URL=https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-win-%ARCH%.zip
 set OUTPUT=nw.zip
 
 echo Downloading %URL%...
-curl %URL% -o %OUTPUT%
+curl -L %URL% -o %OUTPUT%
 if errorlevel 1 (
   echo ERROR: Download failed
   exit /b 1

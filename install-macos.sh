@@ -19,8 +19,7 @@ case "$ARCH" in
     ;;
 esac
 
-VERSION="0.77.0"
-URL="https://dl.node-webkit.org/v${VERSION}/nwjs-v${VERSION}-osx-${NWJS_ARCH}.zip"
+URL="https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-macos-$ARCH.zip"
 OUTPUT="nw.zip"
 
 echo "Downloading $URL..."
@@ -32,4 +31,4 @@ if [ ! -f "$OUTPUT" ]; then
 fi
 
 echo "Extracting $OUTPUT..."
-unzip -q "$OUTPUT"
+unzip "$OUTPUT"
