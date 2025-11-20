@@ -32,15 +32,19 @@
     document.querySelector("#modal-overlay").style.display = "block";
   }
 
-  function closeModal() {
+  window.closeModal = async () => {
     document.querySelector("#modal-overlay").style.display = "none";
   }
 
-  async function updateCompiler() {
+  window.updateCompiler = async () => {
     openModal();
     document.querySelector("#modal-title").innerHTML = "Checking for<br />updates...";
-    var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/releases/latest`);
-    if (!res.ok) {
+    try {
+      var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/releases/latest`);
+      if (!res.ok) {
+        throw "";
+      }
+    } catch {
       document.querySelector("#modal-title").innerHTML = "Failed to check for<br />updates";
       document.querySelector("#modal-button").style.display = "block";
       document.querySelector("#modal-button").innerText = "OK";
@@ -63,7 +67,7 @@
     document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
   }
 
-  async function loadKernels() {
+  window.loadKernels = async () => {
     var page = 0;
     var versions = [];
     do {
@@ -107,13 +111,16 @@
     });
   }
 
-  async function compile() {
+  window.compile = async () => {
     // De-duplication
     if (compiling) {
       return;
     }
     compiling = true;
     document.querySelector("#compile").classList.add("disabled");
+
+    document.querySelector("#status").innerText = "Starting compilation...";
+    document.querySelector("#status").style.color = "yellow";
 
     // Save the config
     config.kernel = document.querySelector("#kernels").value;
@@ -122,6 +129,8 @@
     config.target = document.querySelector("#target").value;
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
+    document.querySelector("#status").innerText = "Cleaning...";
+    document.querySelector("#status").style.color = "yellow";
     // Clean last compilation
     fs.rmSync("dist", {
       "recursive": true,
@@ -131,7 +140,11 @@
 
     // If target is an app, download and unpack nw
     if (config.target.match(/^(windows|linux|macos)-app$/)) {
+      document.querySelector("#status").innerText = "Downloading...";
+      document.querySelector("#status").style.color = "yellow";
       await downloadPlatform(config.target.replace("-app", ""), config.arch);
+      document.querySelector("#status").innerText = "Unpacking...";
+      document.querySelector("#status").style.color = "yellow";
       await new Promise(res => {
         child_process.exec(`${(process.platform == "win32") ? "tar -xf" : "unzip"} ../platforms/catcore-nw-${(config.target == "windows-app") ? "win" : config.target.replace("-app", "")}-${config.arch}.zip`, {
           "cwd": path.join(process.cwd(), "dist")
@@ -147,6 +160,8 @@
     }
     var name = (system.name || "System");
 
+    document.querySelector("#status").innerText = "Copying files...";
+    document.querySelector("#status").style.color = "yellow";
     if (config.target == "windows-app") {
       fs.renameSync("dist/nw.exe", `dist/${name}.exe`);
     }
@@ -347,12 +362,16 @@
       if (config.kernel.startsWith(".")) {
         fs.copyFileSync(config.kernel, path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       } else {
+        document.querySelector("#status").innerText = "Downloading kernel...";
+        document.querySelector("#status").style.color = "yellow";
         try {
           fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel}-${config.arch}`).then(res => res.arrayBuffer())));
         } catch {}
         fs.copyFileSync("kernel-cache", path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       }
       if (config.target == "macos-app") {
+        document.querySelector("#status").innerText = "Applying fixes...";
+        document.querySelector("#status").style.color = "yellow";
         if (process.platform == "darwin") {
           await new Promise(res => child_process.exec(`xattr -cr ${name}.app`, {
             "cwd": path.join(process.cwd(), "dist")
@@ -366,6 +385,8 @@
       }
     }
 
+    document.querySelector("#status").innerText = "Ready!";
+    document.querySelector("#status").style.color = "lime";
     compiling = false;
     document.querySelector("#compile").classList.remove("disabled");
   }
@@ -417,7 +438,6 @@
             <br />
             <select class="input" id="arch">
               <option value="x64" selected>x64</option>
-              <option value="x86">x86</option>
               <option value="arm64">ARM64</option>
             </select>
           </div>
@@ -455,7 +475,7 @@
           </div>
         </div>
 
-        <br />
+        <p id="status" style="color: lime;">Ready!</p>
         <a class="compile" onclick="compile();" id="compile">COMPILE</a>
       </center>
       <div id="modal-overlay" style="display: none;">
