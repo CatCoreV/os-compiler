@@ -134,14 +134,22 @@
     config.target = document.querySelector("#target").value;
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
+    // Clean last compilation
     document.querySelector("#status").innerText = "Cleaning...";
     document.querySelector("#status").style.color = "yellow";
-    // Clean last compilation
-    fs.rmSync("dist", {
-      "recursive": true,
-      "force": true
-    });
-    fs.mkdirSync("dist");
+    try {
+      fs.rmSync("dist", {
+        "recursive": true,
+        "force": true
+      });
+      fs.mkdirSync("dist");
+    } catch {
+      document.querySelector("#status").innerText = `Failed to delete "dist". Did you close the app/folder?`;
+      document.querySelector("#status").style.color = "red";
+      compiling = false;
+      document.querySelector("#compile").classList.remove("disabled");
+      return;
+    }
 
     // If target is an app, download and unpack nw
     if (config.target.match(/^(windows|linux|macos)-app$/)) {
