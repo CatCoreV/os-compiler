@@ -344,7 +344,7 @@
   <body>
     <div class="bootscreen">
       <div>
-        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="system/${system.logo}" onerror="this.style.visibility='hidden';">` : ""}
+        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="system/${system.logo}" onerror="this.style.visibility='hidden';" draggable="false">` : ""}
         </div>
         ${loader}
         <p class="bootextra">Loading bootloader...</p>
