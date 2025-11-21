@@ -370,8 +370,9 @@
         document.querySelector("#status").innerText = "Downloading bootloader...";
         document.querySelector("#status").style.color = "yellow";
         try {
-          // TODO: Autodetect bootloader version
-          fs.writeFileSync("bootloader-cache.bin", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/bootloader-${config.kernel}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
+          var release = await fetch(`https://api.github.com/repos/CatCoreV/catcore/releases/tags/${config.kernel}`).then(res => res.json());
+          var bootloaderVersion = release.assets.find(asset => asset.name.startsWith("bootloader-")).name.match(/^bootloader-(\d\.\d\.\d)/)[1];
+          fs.writeFileSync("bootloader-cache.bin", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/bootloader-${bootloaderVersion}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
         } catch {}
         fs.copyFileSync("bootloader-cache.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
       }
@@ -381,7 +382,7 @@
         document.querySelector("#status").innerText = "Downloading kernel...";
         document.querySelector("#status").style.color = "yellow";
         try {
-          fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
+          fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel.replace("v", "")}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
         } catch {}
         fs.copyFileSync("kernel-cache", path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       }
