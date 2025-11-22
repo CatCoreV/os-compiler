@@ -35,8 +35,38 @@
     "macos-app": "d"
   };
   var texts = {
-    "en": {},
-    "ru": {}
+    "en": {
+      "catcore_compiler": "CatCore Compiler",
+      "compiler": "Compiler",
+      "kernel": "Kernel",
+      "system": "System",
+      "result": "Result",
+      "web": "Website",
+      "windows_app": "Windows app",
+      "linux_app": "Linux app",
+      "macos_app": "MacOS app",
+      "bootable_iso": "Bootable .iso",
+      "windowed": "Windowed",
+      "ready": "Ready!",
+      "compile": "COMPILE!",
+      "checking_for_updates": "Checking for<br />updates..."
+    },
+    "ru": {
+      "catcore_compiler": "Компилятор CatCore",
+      "compiler": "Компилятор",
+      "kernel": "Ядро",
+      "system": "Система",
+      "result": "Результат",
+      "web": "Веб-сайт",
+      "windows_app": "Windows приложение",
+      "linux_app": "Linux приложение",
+      "macos_app": "MacOS приложение",
+      "bootable_iso": "Загрузочный .iso",
+      "windowed": "Оконный",
+      "ready": "Готов!",
+      "compile": "КОМПИЛИРОВАТЬ!",
+      "checking_for_updates": "Проверка<br />обновлений..."
+    }
   };
 
   function text(id) {
@@ -53,7 +83,7 @@
 
   window.updateCompiler = async () => {
     openModal();
-    document.querySelector("#modal-title").innerHTML = "Checking for<br />updates...";
+    document.querySelector("#modal-title").innerHTML = text("checking_for_updates");
     try {
       var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/releases/latest`);
       if (!res.ok) {
@@ -580,7 +610,7 @@
         <br />
         <br />
         <a class="logo">
-          <i class="fa-duotone fa-cat"></i> CatCore Compiler
+          <i class="fa-duotone fa-cat"></i> ${text("catcore_compiler")}
         </a>
         <br />
         <br />
@@ -591,7 +621,7 @@
             <br />
             <i class="fa-sharp fa-solid fa-gear-complex-code stepicon"></i>
             <br />
-            Compiler
+            ${text("compiler")}
             <br />
             <br />
             v${compiler.version} <i class="fa-sharp fa-solid fa-rotate update" onclick="updateCompiler();"></i>
@@ -602,7 +632,7 @@
           <div class="square">
             <i class="fa-sharp fa-solid fa-microchip stepicon"></i>
             <br />
-            Kernel
+            ${text("kernel")}
             <br />
             <br />
             <select class="input" id="kernels">
@@ -623,7 +653,7 @@
             <br />
             <i class="fa-sharp fa-solid fa-code stepicon"></i>
             <br />
-            System
+            ${text("system")}
             <br />
             <br />
             <input type="text" class="input" style="width: 110px;" autocomplete="off" value="src" id="source" required>
@@ -634,27 +664,27 @@
           <div class="square">
             <i class="fa-sharp fa-box-circle-check stepicon"></i>
             <br />
-            Result
+            ${text("result")}
             <br />
             <br />
             <select class="input" id="target">
-              <option value="web" disabled>Web</option>
-              <option value="windows-app">Windows app</option>
-              <option value="linux-app">Linux app</option>
-              <option value="macos-app">MacOS app</option>
-              <option value="iso" disabled>Bootable .iso</option>
+              <option value="web" disabled>${text("web")}</option>
+              <option value="windows-app">${text("windows_app")}</option>
+              <option value="linux-app">${text("linux_app")}</option>
+              <option value="macos-app">${text("macos_app")}</option>
+              <option value="iso" disabled>${text("bootable_iso")}</option>
               <option value="milkv-duos-sd" disabled>MilkV DuoS SD</option>
               <option value="milkv-duos-emmc" disabled>MilkV DuoS EMMC</option>
             </select>
             <br />
-            <label><input type="checkbox" id="windowed"> Windowed</label>
+            <label><input type="checkbox" id="windowed"> ${text("windowed")}</label>
             ${config.dev ? `<br />
             <label><input type="checkbox" id="sdk"> SDK</label>` : ""}
           </div>
         </div>
 
-        <p id="status" style="color: lime;">Ready!</p>
-        <a class="compile" onclick="compile();" id="compile">COMPILE</a> <i class="fa-sharp fa-solid fa-play extra" onclick="start();" style="background-color: #5fcf14;"></i> <i class="fa-sharp fa-solid fa-stop extra" onclick="stop();" style="background-color: #da1212;"></i>
+        <p id="status" style="color: lime;">${text("ready")}</p>
+        <a class="compile" onclick="compile();" id="compile">${text("compile")}</a> <i class="fa-sharp fa-solid fa-play extra" onclick="start();" style="background-color: #5fcf14;"></i> <i class="fa-sharp fa-solid fa-stop extra" onclick="stop();" style="background-color: #da1212;"></i>
       </center>
       <div id="modal-overlay" style="display: none;">
         <center>
