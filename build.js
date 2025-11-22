@@ -369,9 +369,7 @@
         "main": "index.html",
         "window": {}
       };
-      if (config.windowed) {
-        systemPackage.window.fullscreen = true;
-      } else {
+      if (!config.windowed) {
         systemPackage.window.kiosk = true;
       }
       fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify(systemPackage, null, 2));
