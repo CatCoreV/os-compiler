@@ -381,6 +381,7 @@
         "name": name,
         "version": system.version ? `${system.version.startsWith("v") ? "" : "v"}${system.version}` : "v0.0.1",
         "main": "index.html",
+        "chromium-args": "--user-data-dir=data",
         "window": {
           "icon": (system.logo ? `./${(config.target == "macos-app") ? "../../../../" : ""}fs/system/${system.logo}` : "./catcore.png")
         }
