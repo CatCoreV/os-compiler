@@ -10,7 +10,8 @@
       "kernel": "Unknown",
       "arch": (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
       "source": "src",
-      "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`
+      "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`,
+      "windowed": false
     };
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
   }
@@ -75,11 +76,15 @@
   window.loadKernels = async () => {
     var page = 0;
     var versions = [];
-    do {
-      page++;
-      var res = await fetch(`https://api.github.com/repos/CatCoreV/catcore/releases?per_page=100&page=${page}`);
-      versions.push(...(await res.json()).filter(version => !version.prerelease || config.dev).map(version => version.tag_name).filter(version => version.startsWith("v")));
-    } while(res.headers.has("link") && res.headers.get("link").includes(`rel="next"`));
+    try {
+      do {
+        page++;
+        var res = await fetch(`https://api.github.com/repos/CatCoreV/catcore/releases?per_page=100&page=${page}`);
+        versions.push(...(await res.json()).filter(version => !version.prerelease || config.dev).map(version => version.tag_name).filter(version => version.startsWith("v")));
+      } while(res.headers.has("link") && res.headers.get("link").includes(`rel="next"`));
+    } catch {
+      versions = [config.kernel];
+    }
     if (fs.existsSync("kernel-local")) {
       versions.unshift("./kernel-local");
     }
@@ -132,6 +137,8 @@
     config.arch = document.querySelector("#arch").value;
     config.source = document.querySelector("#source").value;
     config.target = document.querySelector("#target").value;
+    config.windowed = document.querySelector("#windowed").checked;
+    var sdk = document.querySelector("#sdk").checked;
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
     // Clean last compilation
@@ -356,14 +363,18 @@
 </html>`;
 
     if (config.target.match(/^(windows|linux|macos)-app$/)) {
-      fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify({
+      var systemPackage = {
         "name": name,
         "version": system.version ? `${system.version.startsWith("v") ? "" : "v"}${system.version}` : "v0.0.1",
         "main": "index.html",
-        "window": {
-          "kiosk": true
-        }
-      }, null, 2));
+        "window": {}
+      };
+      if (config.windowed) {
+        systemPackage.window.fullscreen = true;
+      } else {
+        systemPackage.window.kiosk = true;
+      }
+      fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify(systemPackage, null, 2));
       fs.writeFileSync(path.join(dist, "index.html"), html);
       copyRecursive(src, path.join(dist, "system"));
       try {
@@ -612,7 +623,6 @@
           <i class="fa-sharp fa-solid fa-arrow-right arrow"></i>
 
           <div class="square">
-          <br />
             <i class="fa-sharp fa-box-circle-check stepicon"></i>
             <br />
             Result
@@ -627,6 +637,10 @@
               <option value="milkv-duos-sd" disabled>MilkV DuoS SD</option>
               <option value="milkv-duos-emmc" disabled>MilkV DuoS EMMC</option>
             </select>
+            <br />
+            <label><input type="checkbox" id="windowed"> Windowed</label>
+            ${config.dev ? `<br />
+            <label><input type="checkbox" id="sdk"> SDK</label>` : ""}
           </div>
         </div>
 
