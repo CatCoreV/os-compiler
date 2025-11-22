@@ -395,7 +395,7 @@
       });
       copyRecursive(src, path.join(process.cwd(), "dist", "fs", "system"));
       if (!system.logo) {
-        fs.copyFileSync("catcore.png", path.join(process.cwd(), "dist", "fs", "system"));
+        fs.copyFileSync("catcore.png", path.join(dist, "catcore.png"));
       }
       if (config.kernel.startsWith(".")) {
         fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
