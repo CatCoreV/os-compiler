@@ -402,7 +402,15 @@
         fs.copyFileSync("catcore.png", path.join(dist, "catcore.png"));
       }
       if (config.kernel.startsWith(".")) {
-        fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
+        try {
+          fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
+        } catch {
+          document.querySelector("#status").innerText = `File "bootloader-local.bin" not found.`;
+          document.querySelector("#status").style.color = "red";
+          compiling = false;
+          document.querySelector("#compile").classList.remove("disabled");
+          return;
+        }
       } else {
         document.querySelector("#status").innerText = "Downloading bootloader...";
         document.querySelector("#status").style.color = "yellow";
