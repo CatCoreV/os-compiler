@@ -34,5 +34,6 @@ echo "Extracting $OUTPUT..."
 unzip "$OUTPUT"
 rm -f $OUTPUT
 mv nw.app catcore_compiler.app
+cp catcore.icns catcore_compiler.app/Contents/Resources/nw.icns
 xattr -cr catcore_compiler.app
 chmod -R 777 catcore_compiler.app
