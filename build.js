@@ -7,6 +7,7 @@
     var config = require("./config.json");
   } catch {
     var config = {
+      "language": (["ru", "ru-RU", "ru-UA", "uk", "uk_UA"].includes(navigator.language) ? "ru" : "en"),
       "kernel": "Unknown",
       "arch": (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
       "source": "src",
@@ -33,6 +34,14 @@
     "linux-app": "n",
     "macos-app": "d"
   };
+  var texts = {
+    "en": {},
+    "ru": {}
+  };
+
+  function text(id) {
+    return (texts[config.language][id] || texts["en"][id] || id);
+  }
 
   function openModal() {
     document.querySelector("#modal-overlay").style.display = "block";
