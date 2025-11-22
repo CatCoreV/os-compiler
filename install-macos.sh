@@ -35,5 +35,8 @@ unzip "$OUTPUT"
 rm -f $OUTPUT
 mv nw.app catcore_compiler.app
 cp catcore.icns catcore_compiler.app/Contents/Resources/nw.icns
+cp catcore.icns catcore_compiler.app/Contents/Resources/app.icns
+cp catcore.icns catcore_compiler.app/Contents/Resources/documents.icns
 xattr -cr catcore_compiler.app
 chmod -R 777 catcore_compiler.app
+touch catcore_compiler.app
