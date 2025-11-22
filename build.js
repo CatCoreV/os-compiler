@@ -110,7 +110,7 @@
 
   function copyRecursive(from, to) {
     if (!fs.existsSync(to)) {
-      fs.mkdirSync(to); 
+      fs.mkdirSync(to);
     }
     fs.readdirSync(from).forEach(content => {
       if (fs.statSync(path.join(from, content)).isDirectory()) {
