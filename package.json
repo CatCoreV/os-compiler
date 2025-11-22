@@ -9,7 +9,7 @@
     "height": 430,
     "position": "center",
     "resizable": false,
-    "icon": "catcore.png"
+    "icon": "./catcore.png"
   },
   "user-agent": "CatCore SDK (%ver)",
   "scripts": {
