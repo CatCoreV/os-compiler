@@ -145,9 +145,17 @@
     document.querySelector("#status").innerText = "Cleaning...";
     document.querySelector("#status").style.color = "yellow";
     try {
-      fs.rmSync("dist", {
-        "recursive": true,
-        "force": true
+      await new Promise((res, rej) => {
+        fs.rm("dist", {
+          "recursive": true,
+          "force": true
+        }, (err) => {
+          if (err) {
+            rej();
+          } else {
+            res();
+          }
+        });
       });
       fs.mkdirSync("dist");
     } catch {
