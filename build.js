@@ -11,7 +11,7 @@
     "windowed": false
   };
   try {
-    config = require("./config.json");
+    config = JSON.parse(fs.readFileSync("config.json").toString("utf-8"));
   } catch {}
   fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
@@ -91,8 +91,8 @@
       versions.unshift(...fs.readdirSync("../kernel/dist").map(version => `../kernel/dist/${version}`));
     }
     document.querySelector("#kernels").innerHTML = versions.map(version => `<option value="${version}">${version}</option>`);
-    if (versions.includes(config.version)) {
-      document.querySelector("#kernels").value = config.version;
+    if (versions.includes(config.kernel)) {
+      document.querySelector("#kernels").value = config.kernel;
     } else {
       document.querySelector("#kernels").value = versions[0];
     }
@@ -365,7 +365,7 @@
   <body>
     <div class="bootscreen">
       <div>
-        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="system/${system.logo}" onerror="this.style.visibility='hidden';" draggable="false">` : ""}
+        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="${(config.target == "macos-app") ? "../../../../" : ""}fs/system/${system.logo}" onerror="this.style.visibility='hidden';" draggable="false">` : ""}
         </div>
         ${loader}
         <p class="bootextra">Loading bootloader...</p>
@@ -394,6 +394,9 @@
         fs.unlinkSync(path.join(dist, "system", "system.json"));
       } catch {}
       fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "boot"), {
+        "recursive": true
+      });
+      fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "system"), {
         "recursive": true
       });
       if (fs.existsSync(path.join(src, "overlay-fs"))) {
