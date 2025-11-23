@@ -33,6 +33,10 @@ fi
 echo "Extracting $OUTPUT..."
 unzip "$OUTPUT"
 rm -f $OUTPUT
-mv nw.app catcore_compiler.app
-xattr -cr catcore_compiler.app
-chmod -R 777 catcore_compiler.app
+mv nw.app "Catcore Compiler.app"
+cp catcore.icns "Catcore Compiler.app/Contents/Resources/nw.icns"
+cp catcore.icns "Catcore Compiler.app/Contents/Resources/app.icns"
+cp catcore.icns "Catcore Compiler.app/Contents/Resources/document.icns"
+xattr -cr "Catcore Compiler.app"
+chmod -R 777 "Catcore Compiler.app"
+touch "Catcore Compiler.app"

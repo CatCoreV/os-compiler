@@ -3,19 +3,18 @@
   var fs = require("fs");
   var path = require("path");
   var child_process = require("child_process");
+  var config = {
+    "language": (["ru", "ru-RU", "ru-UA", "uk", "uk_UA"].includes(navigator.language) ? "ru" : "en"),
+    "kernel": "Unknown",
+    "arch": (["x64", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
+    "source": "src",
+    "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`,
+    "windowed": false
+  };
   try {
-    var config = require("./config.json");
-  } catch {
-    var config = {
-      "language": (["ru", "ru-RU", "ru-UA", "uk", "uk_UA"].includes(navigator.language) ? "ru" : "en"),
-      "kernel": "Unknown",
-      "arch": (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
-      "source": "src",
-      "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`,
-      "windowed": false
-    };
-    fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
-  }
+    config = JSON.parse(fs.readFileSync("config.json").toString("utf-8"));
+  } catch {}
+  fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
   if (!config.dev && (process.versions["nw-flavor"] == "sdk" || fs.existsSync("payload.exe") || fs.existsSync("nwjc.exe") || fs.existsSync("nacl64.exe") || fs.existsSync("chromedriver.exe") || fs.existsSync("pnacl") || fs.existsSync("chromedriver") || fs.existsSync("minidump_stackwalk") || fs.existsSync("nacl_helper") || fs.existsSync("nacl_helper_bootstrap") || fs.existsSync("nacl_irt_x86_64.nexe") || fs.existsSync("nwjc"))) {
     return process.exit(1);
@@ -112,7 +111,34 @@
     document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
   }
 
-  window.loadKernels = async () => {
+  window.updateCompilerDev = async () => {
+    openModal();
+    document.querySelector("#modal-title").innerHTML = "Preparing for<br />updates...";
+    try {
+      var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents`);
+      if (!res.ok) {
+        throw "";
+      }
+    } catch {
+      document.querySelector("#modal-title").innerHTML = "Failed to prepare for<br />updates";
+      document.querySelector("#modal-button").style.display = "block";
+      document.querySelector("#modal-button").innerText = "OK";
+      return;
+    }
+    res = await res.json();
+    document.querySelector("#modal-title").innerHTML = "Updating...";
+    for (var asset of res) {
+      if (asset.type == "file") {
+        fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+      }
+    }
+    document.querySelector("#modal-title").innerHTML = `Updated to main branch.`;
+    document.querySelector("#modal-button").style.display = "block";
+    document.querySelector("#modal-button").innerText = "Restart";
+    document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
+  }
+
+  async function loadKernels() {
     var page = 0;
     var versions = [];
     try {
@@ -127,30 +153,34 @@
     if (fs.existsSync("kernel-local")) {
       versions.unshift("./kernel-local");
     }
+    if (config.dev && fs.existsSync("../kernel/dist")) {
+      versions.unshift(...fs.readdirSync("../kernel/dist").map(version => `../kernel/dist/${version}`));
+    }
     document.querySelector("#kernels").innerHTML = versions.map(version => `<option value="${version}">${version}</option>`);
-    if (versions.includes(config.version)) {
-      document.querySelector("#kernels").value = config.version;
+    if (versions.includes(config.kernel)) {
+      document.querySelector("#kernels").value = config.kernel;
     } else {
       document.querySelector("#kernels").value = versions[0];
     }
   }
 
-  async function downloadPlatform(system, arch) {
+  async function downloadPlatform(system, arch, sdk) {
     if (system == "windows") {
       system = "win";
     }
     if (arch == "x86") {
       arch = "ia32";
     }
-    if (fs.existsSync(`platforms/catcore-nw-${system}-${arch}.zip`)) {
+    if (fs.existsSync(`platforms/catcore-nw-${system}-${arch}${sdk ? "-dev" : ""}.zip`)) {
       return;
     }
-    fs.writeFileSync(`platforms/catcore-nw-${system}-${arch}.zip`, Buffer.from(await fetch(`https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-${system}-${arch}.zip`).then(res => res.arrayBuffer())));
+    fs.writeFileSync(`platforms/catcore-nw-${system}-${arch}${sdk ? "-dev" : ""}.zip`, Buffer.from(await fetch(`https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-${system}-${arch}${sdk ? "-dev" : ""}.zip`).then(res => res.arrayBuffer())));
   }
 
-
   function copyRecursive(from, to) {
-    fs.mkdirSync(to);
+    if (!fs.existsSync(to)) {
+      fs.mkdirSync(to);
+    }
     fs.readdirSync(from).forEach(content => {
       if (fs.statSync(path.join(from, content)).isDirectory()) {
         copyRecursive(path.join(from, content), path.join(to, content));
@@ -178,15 +208,26 @@
     config.target = document.querySelector("#target").value;
     config.windowed = document.querySelector("#windowed").checked;
     var sdk = document.querySelector("#sdk").checked;
+    if (!config.dev) {
+      sdk = false;
+    }
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
     // Clean last compilation
     document.querySelector("#status").innerText = "Cleaning...";
     document.querySelector("#status").style.color = "yellow";
     try {
-      fs.rmSync("dist", {
-        "recursive": true,
-        "force": true
+      await new Promise((res, rej) => {
+        fs.rm("dist", {
+          "recursive": true,
+          "force": true
+        }, (err) => {
+          if (err) {
+            rej();
+          } else {
+            res();
+          }
+        });
       });
       fs.mkdirSync("dist");
     } catch {
@@ -201,22 +242,21 @@
     if (config.target.match(/^(windows|linux|macos)-app$/)) {
       document.querySelector("#status").innerText = "Downloading...";
       document.querySelector("#status").style.color = "yellow";
-      await downloadPlatform(config.target.replace("-app", ""), config.arch);
+      await downloadPlatform(config.target.replace("-app", ""), config.arch, sdk);
       document.querySelector("#status").innerText = "Unpacking...";
       document.querySelector("#status").style.color = "yellow";
       await new Promise(res => {
-        child_process.exec(`${(process.platform == "win32") ? "tar -xf" : "unzip"} ../platforms/catcore-nw-${(config.target == "windows-app") ? "win" : config.target.replace("-app", "")}-${config.arch}.zip`, {
+        child_process.exec(`${(process.platform == "win32") ? "tar -xf" : "unzip"} ../platforms/catcore-nw-${(config.target == "windows-app") ? "win" : config.target.replace("-app", "")}-${config.arch}${sdk ? "-dev" : ""}.zip`, {
           "cwd": path.join(process.cwd(), "dist")
         }, res);
       });
     }
 
     var src = path.join(process.cwd(), config.source);
+    var system = {};
     try {
-      var system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
-    } catch {
-      var system = {};
-    }
+      system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
+    } catch {}
     var name = (system.name || "System");
 
     document.querySelector("#status").innerText = "Copying files...";
@@ -357,6 +397,7 @@
         font-size: 18px;
         color: white;
         text-align: center;
+        user-select: none;
       }
       .cctext {
         position: fixed;
@@ -383,14 +424,14 @@
         if ((process.versions["nw-flavor"] == "sdk" || fs.existsSync("payload.exe") || fs.existsSync("nwjc.exe") || fs.existsSync("nacl64.exe") || fs.existsSync("chromedriver.exe") || fs.existsSync("pnacl") || fs.existsSync("chromedriver") || fs.existsSync("minidump_stackwalk") || fs.existsSync("nacl_helper") || fs.existsSync("nacl_helper_bootstrap") || fs.existsSync("nacl_irt_x86_64.nexe") || fs.existsSync("nwjc"))) {
           return process.exit(1);
         }`}
-        nw.Window.get().evalNWBin(null, "fs/boot/bootloader.bin");
+        nw.Window.get().evalNWBin(null, "${(config.target == "macos-app") ? "../../../../" : ""}fs/boot/bootloader.bin");
       })();
     </script>
   </head>
   <body>
     <div class="bootscreen">
       <div>
-        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="system/${system.logo}" onerror="this.style.visibility='hidden';" draggable="false">` : ""}
+        <div class="imageCont prtclk" data-back="false">${system.logo ? `\n          <img width="180px" height="180px" data-free="false" src="${(config.target == "macos-app") ? "../../../../" : ""}fs/system/${system.logo}" onerror="this.style.visibility='hidden';" draggable="false">` : ""}
         </div>
         ${loader}
         <p class="bootextra">Loading bootloader...</p>
@@ -406,24 +447,43 @@
         "name": name,
         "version": system.version ? `${system.version.startsWith("v") ? "" : "v"}${system.version}` : "v0.0.1",
         "main": "index.html",
-        "window": {}
+        "window": {
+          "icon": (system.logo ? `./${(config.target == "macos-app") ? "../../../../" : ""}fs/system/${system.logo}` : "./catcore.png")
+        }
       };
-      if (config.windowed) {
-        systemPackage.window.fullscreen = true;
-      } else {
+      if (!config.windowed) {
         systemPackage.window.kiosk = true;
       }
       fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify(systemPackage, null, 2));
       fs.writeFileSync(path.join(dist, "index.html"), html);
-      copyRecursive(src, path.join(dist, "system"));
       try {
         fs.unlinkSync(path.join(dist, "system", "system.json"));
       } catch {}
       fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "boot"), {
         "recursive": true
       });
+      fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "config"), {
+        "recursive": true
+      });
+      fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "system"), {
+        "recursive": true
+      });
+      if (fs.existsSync(path.join(src, "overlay-fs"))) {
+        copyRecursive(path.join(src, "overlay-fs"), path.join(process.cwd(), "dist", "fs"));
+      }
+      if (!system.logo) {
+        fs.copyFileSync("catcore.png", path.join(dist, "catcore.png"));
+      }
       if (config.kernel.startsWith(".")) {
-        fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
+        try {
+          fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
+        } catch {
+          document.querySelector("#status").innerText = `File "bootloader-local.bin" not found.`;
+          document.querySelector("#status").style.color = "red";
+          compiling = false;
+          document.querySelector("#compile").classList.remove("disabled");
+          return;
+        }
       } else {
         document.querySelector("#status").innerText = "Downloading bootloader...";
         document.querySelector("#status").style.color = "yellow";
@@ -457,6 +517,9 @@
             "cwd": path.join(process.cwd(), "dist")
           }, res));
         }
+        fs.copyFileSync("catcore.icns", path.join(process.cwd(), "dist", `${name}.app`, "Contents", "Resources", "nw.icns"));
+        fs.copyFileSync("catcore.icns", path.join(process.cwd(), "dist", `${name}.app`, "Contents", "Resources", "app.icns"));
+        fs.copyFileSync("catcore.icns", path.join(process.cwd(), "dist", `${name}.app`, "Contents", "Resources", "documents.icns"));
       }
     }
 
@@ -468,11 +531,10 @@
 
   window.start = () => {
     var src = path.join(process.cwd(), config.source);
+    var system = {};
     try {
-      var system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
-    } catch {
-      var system = {};
-    }
+      system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
+    } catch {}
     var name = (system.name || "System");
 
     if (config.target == "windows-app") {
@@ -534,11 +596,10 @@
 
   window.stop = () => {
     var src = path.join(process.cwd(), config.source);
+    var system = {};
     try {
-      var system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
-    } catch {
-      var system = {};
-    }
+      system = JSON.parse(fs.readFileSync(path.join(src, "system.json")).toString("utf-8"));
+    } catch {}
     var name = (system.name || "System");
 
     if (config.target == "windows-app") {
@@ -590,11 +651,18 @@
         document.querySelector("#status").style.color = "red";
         return;
       }
-      // TODO: Support
-      document.querySelector("#status").innerText = "Stopping MacOS apps is not currently supported.";
-      document.querySelector("#status").style.color = "red";
+      if (name.includes("'")) {
+        document.querySelector("#status").innerText = "System name includes unsafe characters.";
+        document.querySelector("#status").style.color = "red";
+        return;
+      }
+      child_process.exec(`kill -9 $(ps -eo pid,command | grep 'dist/${name}.app/Contents/MacOS/nwjs' | grep -v grep | awk '{print $1}')`);
+      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").style.color = "lime";
     }
   };
+
+  window.loadKernels = loadKernels;
 
   window.addEventListener("DOMContentLoaded", () => {
     document.body.innerHTML = `
@@ -624,7 +692,9 @@
             ${text("compiler")}
             <br />
             <br />
-            v${compiler.version} <i class="fa-sharp fa-solid fa-rotate update" onclick="updateCompiler();"></i>
+            v${compiler.version}
+            <i class="fa-sharp fa-solid fa-rotate update" onclick="updateCompiler();"></i>
+            ${config.dev ? `<i class="fa-sharp fa-solid fa-wrench update" onclick="updateCompilerDev();"></i>` : ""}
           </div>
 
           <i class="fa-sharp fa-solid fa-arrow-right arrow"></i>
@@ -706,5 +776,6 @@
     document.querySelector("#arch").value = config.arch;
     document.querySelector("#source").value = config.source;
     document.querySelector("#target").value = config.target;
+    document.querySelector("#windowed").checked = config.windowed;
   });
 })();

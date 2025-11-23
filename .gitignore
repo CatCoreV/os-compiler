@@ -38,3 +38,5 @@ node_modules/
 package-lock.json
 bootloader-cache.bin
 kernel-cache
+bootloader-local.bin
+data/
