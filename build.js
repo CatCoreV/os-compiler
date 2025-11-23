@@ -3,8 +3,12 @@
   var fs = require("fs");
   var path = require("path");
   var child_process = require("child_process");
+  var supportedLanguages = [
+    [["ru", "ru-RU", "ru-UA", "uk", "uk_UA"], "ru"],
+    ["en"]
+  ];
   var config = {
-    "language": (["ru", "ru-RU", "ru-UA", "uk", "uk_UA"].includes(navigator.language) ? "ru" : "en"),
+    "language": supportedLanguages.find(lang => (lang.length < 2 || lang[0].includes(navigator.language)))[1],
     "kernel": "Unknown",
     "arch": (["x64", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
     "source": "src",
@@ -716,17 +720,32 @@
     }
   };
 
+  window.toggleLanguageSelect = () => {
+    var langSelect = document.querySelector("#language-select");
+    langSelect.style.display = (langSelect.style.display == "block" ? "none" : "block");
+  };
+
+  window.setLanguage = lang => {
+    config.language = lang;
+    fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
+    openCompiler();
+  };
+
   window.loadKernels = loadKernels;
 
-  window.addEventListener("DOMContentLoaded", () => {
+  function openCompiler() {
     document.body.innerHTML = `
       <div id="titlebar">
+        <p id="language" onclick="toggleLanguageSelect();">${config.language.toUpperCase()} <i class="fa-duotone fa-solid fa-caret-down"></i></p>
         <p id="minimize" onclick="nw.Window.get().minimize();">
           <i class="fa-sharp fa-solid fa-window-minimize"></i>
         </p>
         <p id="close" onclick="nw.Window.get().close(true);">
           <i class="fa-sharp fa-solid fa-xmark"></i>
         </p>
+      </div>
+      <div id="language-select" style="display: none;">
+        ${supportedLanguages.map(lang => lang.at(-1)).map(lang => `<span onclick="setLanguage('${lang}');">${lang.toUpperCase()}</span>`).join("")}
       </div>
       <center>
         <br />
@@ -831,5 +850,7 @@
     document.querySelector("#source").value = config.source;
     document.querySelector("#target").value = config.target;
     document.querySelector("#windowed").checked = config.windowed;
-  });
+  }
+
+  window.addEventListener("DOMContentLoaded", openCompiler);
 })();

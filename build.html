@@ -19,11 +19,20 @@
 #titlebar {
   position: fixed;
   top: 0;
-  left: 0;
-  width: calc(100% - 90px);
+  left: 60px;
+  width: calc(100% - 150px);
   height: 30px;
   -webkit-app-region: drag;
   z-index: 1;
+}
+
+#language {
+  position: fixed;
+  top: -5px;
+  left: 15px;
+  cursor: pointer;
+  z-index: 2;
+  padding: 4px;
 }
 
 #minimize {
@@ -46,6 +55,21 @@
   border-radius: 5px;
   cursor: pointer;
   z-index: 2;
+}
+
+#language-select {
+  position: fixed;
+  top: 40px;
+  left: 18px;
+  background-color: #333333;
+  transition: display .5s ease-in-out;
+  border-radius: 3px;
+}
+
+#language-select span {
+  display: block;
+  padding: 4px;
+  cursor: pointer;
 }
 
 body {
