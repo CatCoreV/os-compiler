@@ -58,8 +58,7 @@
       "updating": "Updating...",
       "updated": "Updated.",
       "restart": "Restart",
-      "preparing_updates": "Preparing for<br />updates...",
-      "update_preparing_failed": "Failed to prepare for<br />updates",
+      "update_failed": "Failed to<br />update",
       "updated_dev": "Updated to main branch.",
       "starting_compilation": "Starting compilation...",
       "cleaning": "Cleaning...",
@@ -101,8 +100,7 @@
       "updating": "Обновление...",
       "updated": "Обновлено.",
       "restart": "Перезагрузить",
-      "preparing_updates": "Подготовка<br />обновлений...",
-      "update_preparing_failed": "Не удалось подготовить<br />обновления",
+      "update_failed": "Не удалось<br />обновить",
       "updated_dev": "Обновлено на main ветку.",
       "starting_compilation": "Начинание компиляции...",
       "cleaning": "Очистка...",
@@ -171,25 +169,30 @@
 
   window.updateCompilerDev = async () => {
     openModal();
-    document.querySelector("#modal-title").innerHTML = text("preparing_updates");
-    try {
-      var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents`);
-      if (!res.ok) {
-        throw "";
-      }
-    } catch {
-      document.querySelector("#modal-title").innerHTML = text("update_preparing_failed");
-      document.querySelector("#modal-button").style.display = "block";
-      document.querySelector("#modal-button").innerText = "OK";
-      return;
-    }
-    res = await res.json();
     document.querySelector("#modal-title").innerHTML = text("updating");
-    for (var asset of res) {
-      if (asset.type == "file") {
-        fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+    async function updateFolder(path) {
+      try {
+        var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents/${path}`);
+        if (!res.ok) {
+          throw "";
+        }
+      } catch {
+        document.querySelector("#modal-title").innerHTML = text("update_failed");
+        document.querySelector("#modal-button").style.display = "block";
+        document.querySelector("#modal-button").innerText = "OK";
+        return;
+      }
+      res = await res.json();
+      for (var asset of res) {
+        if (asset.type == "file") {
+          fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+        }
+        if (asset.type == "dir") {
+          await updateFolder(asset.path);
+        }
       }
     }
+    await updateFolder("");
     document.querySelector("#modal-title").innerHTML = text("updated_dev");
     document.querySelector("#modal-button").style.display = "block";
     document.querySelector("#modal-button").innerText = text("restart");
