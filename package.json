@@ -2,7 +2,7 @@
   "name": "os-compiler",
   "version": "0.0.1",
   "main": "build.html",
-  "chromium-args": "--enable-transparent-visuals --disable-gpu --user-data-dir=data",
+  "chromium-args": "--enable-transparent-visuals --disable-gpu",
   "window": {
     "frame": false,
     "width": 850,
