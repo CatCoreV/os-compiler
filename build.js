@@ -72,6 +72,33 @@
     document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
   }
 
+  window.updateCompilerDev = async () => {
+    openModal();
+    document.querySelector("#modal-title").innerHTML = "Preparing for<br />updates...";
+    try {
+      var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents`);
+      if (!res.ok) {
+        throw "";
+      }
+    } catch {
+      document.querySelector("#modal-title").innerHTML = "Failed to prepare for<br />updates";
+      document.querySelector("#modal-button").style.display = "block";
+      document.querySelector("#modal-button").innerText = "OK";
+      return;
+    }
+    res = await res.json();
+    document.querySelector("#modal-title").innerHTML = "Updating...";
+    for (var asset of res) {
+      if (asset.type == "file") {
+        fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+      }
+    }
+    document.querySelector("#modal-title").innerHTML = `Updated to main branch.`;
+    document.querySelector("#modal-button").style.display = "block";
+    document.querySelector("#modal-button").innerText = "Restart";
+    document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
+  }
+
   async function loadKernels() {
     var page = 0;
     var versions = [];
@@ -626,7 +653,9 @@
             Compiler
             <br />
             <br />
-            v${compiler.version} <i class="fa-sharp fa-solid fa-rotate update" onclick="updateCompiler();"></i>
+            v${compiler.version}
+            <i class="fa-sharp fa-solid fa-rotate update" onclick="updateCompiler();"></i>
+            ${config.dev ? `<i class="fa-sharp fa-solid fa-wrench update" onclick="updateCompilerDev();"></i>` : ""}
           </div>
 
           <i class="fa-sharp fa-solid fa-arrow-right arrow"></i>
