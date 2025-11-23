@@ -496,7 +496,7 @@
         </div>
         ${(config.target == "macos-app") ? `<script>
           document.querySelector(".imageCont img").style.visibility = "";
-          document.querySelector(".imageCont img").src = path.join(process.cwd(), "..", "..", "..", "..", "fs", "system", "${system.logo}");
+          document.querySelector(".imageCont img").src = \`file://\${require("node:path").join(process.cwd(), "..", "..", "..", "..", "fs", "system", "${system.logo}")}\`;
         </script>` : ""}
         ${loader}
         <p class="bootextra">Loading bootloader...</p>
