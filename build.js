@@ -48,7 +48,25 @@
       "windowed": "Windowed",
       "ready": "Ready!",
       "compile": "COMPILE!",
-      "checking_for_updates": "Checking for<br />updates..."
+      "checking_updates": "Checking for<br />updates...",
+      "update_checking_failed": "Failed to check for<br />updates",
+      "latest_version": "You're using<br />the latest version!",
+      "updating": "Updating...",
+      "updated": "Updated.",
+      "restart": "Restart",
+      "preparing_updates": "Preparing for<br />updates...",
+      "update_preparing_failed": "Failed to prepare for<br />updates",
+      "updated_dev": "Updated to main branch.",
+      "starting_compilation": "Starting compilation...",
+      "cleaning": "Cleaning...",
+      "cleaning_failed": "Failed to clean. Did you close the app/folder?",
+      "downloading": "Downloading...",
+      "unpacking": "Unpacking...",
+      "copying": "Copying files...",
+      "local_bootloader_not_found": `File "bootloader-local.bin" not found.`,
+      "downloading_bootloader": "Downloading bootloader...",
+      "downloading_kernel": "Downloading kernel...",
+      "applying_fixes": "Applying fixes..."
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -64,7 +82,25 @@
       "windowed": "Оконный",
       "ready": "Готов!",
       "compile": "КОМПИЛИРОВАТЬ!",
-      "checking_for_updates": "Проверка<br />обновлений..."
+      "checking_updates": "Проверка<br />обновлений...",
+      "update_checking_failed": "Не удалось проверить<br />обновления",
+      "latest_version": "Вы используете<br />последнюю версию!",
+      "updating": "Обновление...",
+      "updated": "Обновлено.",
+      "restart": "Перезагрузить",
+      "preparing_updates": "Подготовка<br />обновлений...",
+      "update_preparing_failed": "Не удалось подготовить<br />обновления",
+      "updated_dev": "Обновлено на main ветку.",
+      "starting_compilation": "Начинание компиляции...",
+      "cleaning": "Очистка...",
+      "cleaning_failed": "Не удалось очистить. Вы закрыли приложение/папку?",
+      "downloading": "Скачиваниее...",
+      "unpacking": "Распаковка...",
+      "copying": "Копирование файлов...",
+      "local_bootloader_not_found": `Файл "bootloader-local.bin" не найден.`,
+      "downloading_bootloader": "Скачивание загрузчика...",
+      "downloading_kernel": "Скаичвание ядра...",
+      "applying_fixes": "Принятие исправлений..."
     }
   };
 
@@ -82,59 +118,59 @@
 
   window.updateCompiler = async () => {
     openModal();
-    document.querySelector("#modal-title").innerHTML = text("checking_for_updates");
+    document.querySelector("#modal-title").innerHTML = text("checking_updates");
     try {
       var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/releases/latest`);
       if (!res.ok) {
         throw "";
       }
     } catch {
-      document.querySelector("#modal-title").innerHTML = "Failed to check for<br />updates";
+      document.querySelector("#modal-title").innerHTML = text("update_checking_failed");
       document.querySelector("#modal-button").style.display = "block";
       document.querySelector("#modal-button").innerText = "OK";
       return;
     }
     res = await res.json();
     if (res.tag_name.replace("v", "") == compiler.version) {
-      document.querySelector("#modal-title").innerHTML = "You're using<br />the latest version!";
+      document.querySelector("#modal-title").innerHTML = text("latest_version");
       document.querySelector("#modal-button").style.display = "block";
       document.querySelector("#modal-button").innerText = "OK";
       return;
     }
-    document.querySelector("#modal-title").innerHTML = "Updating...";
+    document.querySelector("#modal-title").innerHTML = text("updating");
     for (var asset of res.assets) {
       fs.writeFileSync(asset.name, Buffer.from(await fetch(asset.browser_download_url).then(res => res.arrayBuffer())));
     }
-    document.querySelector("#modal-title").innerHTML = `Updated.<br /><br />v${compiler.version} --> ${res.tag_name}`;
+    document.querySelector("#modal-title").innerHTML = `${text("updated")}<br /><br />v${compiler.version} --> ${res.tag_name}`;
     document.querySelector("#modal-button").style.display = "block";
-    document.querySelector("#modal-button").innerText = "Restart";
+    document.querySelector("#modal-button").innerText = text("restart");
     document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
   }
 
   window.updateCompilerDev = async () => {
     openModal();
-    document.querySelector("#modal-title").innerHTML = "Preparing for<br />updates...";
+    document.querySelector("#modal-title").innerHTML = text("preparing_updates");
     try {
       var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents`);
       if (!res.ok) {
         throw "";
       }
     } catch {
-      document.querySelector("#modal-title").innerHTML = "Failed to prepare for<br />updates";
+      document.querySelector("#modal-title").innerHTML = text("update_preparing_failed");
       document.querySelector("#modal-button").style.display = "block";
       document.querySelector("#modal-button").innerText = "OK";
       return;
     }
     res = await res.json();
-    document.querySelector("#modal-title").innerHTML = "Updating...";
+    document.querySelector("#modal-title").innerHTML = text("updating");
     for (var asset of res) {
       if (asset.type == "file") {
         fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
       }
     }
-    document.querySelector("#modal-title").innerHTML = `Updated to main branch.`;
+    document.querySelector("#modal-title").innerHTML = text("updated_dev");
     document.querySelector("#modal-button").style.display = "block";
-    document.querySelector("#modal-button").innerText = "Restart";
+    document.querySelector("#modal-button").innerText = text("restart");
     document.querySelector("#modal-button").addEventListener("click", () => nw.Window.get().close(true));
   }
 
@@ -198,7 +234,7 @@
     compiling = true;
     document.querySelector("#compile").classList.add("disabled");
 
-    document.querySelector("#status").innerText = "Starting compilation...";
+    document.querySelector("#status").innerText = text("starting_compilation");
     document.querySelector("#status").style.color = "yellow";
 
     // Save the config
@@ -214,7 +250,7 @@
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
     // Clean last compilation
-    document.querySelector("#status").innerText = "Cleaning...";
+    document.querySelector("#status").innerText = text("cleaning");
     document.querySelector("#status").style.color = "yellow";
     try {
       await new Promise((res, rej) => {
@@ -231,7 +267,7 @@
       });
       fs.mkdirSync("dist");
     } catch {
-      document.querySelector("#status").innerText = `Failed to delete "dist". Did you close the app/folder?`;
+      document.querySelector("#status").innerText = text("cleaning_failed");
       document.querySelector("#status").style.color = "red";
       compiling = false;
       document.querySelector("#compile").classList.remove("disabled");
@@ -240,10 +276,10 @@
 
     // If target is an app, download and unpack nw
     if (config.target.match(/^(windows|linux|macos)-app$/)) {
-      document.querySelector("#status").innerText = "Downloading...";
+      document.querySelector("#status").innerText = text("downloading");
       document.querySelector("#status").style.color = "yellow";
       await downloadPlatform(config.target.replace("-app", ""), config.arch, sdk);
-      document.querySelector("#status").innerText = "Unpacking...";
+      document.querySelector("#status").innerText = text("unpacking");
       document.querySelector("#status").style.color = "yellow";
       await new Promise(res => {
         child_process.exec(`${(process.platform == "win32") ? "tar -xf" : "unzip"} ../platforms/catcore-nw-${(config.target == "windows-app") ? "win" : config.target.replace("-app", "")}-${config.arch}${sdk ? "-dev" : ""}.zip`, {
@@ -259,7 +295,7 @@
     } catch {}
     var name = (system.name || "System");
 
-    document.querySelector("#status").innerText = "Copying files...";
+    document.querySelector("#status").innerText = text("copying");
     document.querySelector("#status").style.color = "yellow";
     if (config.target == "windows-app") {
       fs.renameSync("dist/nw.exe", `dist/${name}.exe`);
@@ -478,14 +514,14 @@
         try {
           fs.copyFileSync("bootloader-local.bin", path.join(process.cwd(), "dist", "fs", "boot", "bootloader.bin"));
         } catch {
-          document.querySelector("#status").innerText = `File "bootloader-local.bin" not found.`;
+          document.querySelector("#status").innerText = text("local_bootloader_not_found");
           document.querySelector("#status").style.color = "red";
           compiling = false;
           document.querySelector("#compile").classList.remove("disabled");
           return;
         }
       } else {
-        document.querySelector("#status").innerText = "Downloading bootloader...";
+        document.querySelector("#status").innerText = text("downloading_bootloader");
         document.querySelector("#status").style.color = "yellow";
         try {
           var release = await fetch(`https://api.github.com/repos/CatCoreV/catcore/releases/tags/${config.kernel}`).then(res => res.json());
@@ -497,7 +533,7 @@
       if (config.kernel.startsWith(".")) {
         fs.copyFileSync(config.kernel, path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       } else {
-        document.querySelector("#status").innerText = "Downloading kernel...";
+        document.querySelector("#status").innerText = text("downloading_kernel");
         document.querySelector("#status").style.color = "yellow";
         try {
           fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel.replace("v", "")}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
@@ -505,7 +541,7 @@
         fs.copyFileSync("kernel-cache", path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       }
       if (config.target == "macos-app") {
-        document.querySelector("#status").innerText = "Applying fixes...";
+        document.querySelector("#status").innerText = text("applying_fixes");
         document.querySelector("#status").style.color = "yellow";
         if (process.platform == "darwin") {
           await new Promise(res => child_process.exec(`xattr -cr ${name}.app`, {
@@ -523,7 +559,7 @@
       }
     }
 
-    document.querySelector("#status").innerText = "Ready!";
+    document.querySelector("#status").innerText = text("ready");
     document.querySelector("#status").style.color = "lime";
     compiling = false;
     document.querySelector("#compile").classList.remove("disabled");
@@ -551,7 +587,7 @@
       child_process.spawn(`dist/${name}.exe`, {
         "detached": true
       });
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "linux-app") {
       if (process.platform == "darwin") {
@@ -573,7 +609,7 @@
           "detached": true
         });
       }
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "macos-app") {
       if (process.platform != "darwin") {
@@ -589,7 +625,7 @@
       child_process.spawn("open", [`dist/${name}.app`], {
         "detached": true
       });
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     }
   };
@@ -616,7 +652,7 @@
       child_process.spawn("C:\\Windows\\System32\\taskkill.exe", ["/f", "/im", `${name}.exe`], {
         "detached": true
       });
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "linux-app") {
       if (process.platform == "darwin") {
@@ -638,7 +674,7 @@
           "detached": true
         });
       }
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "macos-app") {
       if (process.platform != "darwin") {
@@ -657,7 +693,7 @@
         return;
       }
       child_process.exec(`kill -9 $(ps -eo pid,command | grep 'dist/${name}.app/Contents/MacOS/nwjs' | grep -v grep | awk '{print $1}')`);
-      document.querySelector("#status").innerText = "Ready!";
+      document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     }
   };
