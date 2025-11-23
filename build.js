@@ -66,7 +66,16 @@
       "local_bootloader_not_found": `File "bootloader-local.bin" not found.`,
       "downloading_bootloader": "Downloading bootloader...",
       "downloading_kernel": "Downloading kernel...",
-      "applying_fixes": "Applying fixes..."
+      "applying_fixes": "Applying fixes...",
+      "unable_to_find": "Unable to find",
+      "did_you_compile_first": "Did you compile first?",
+      "unable_launch_windows_app_on_other_platform": "Unable to launch Windows app on a different platform.",
+      "unable_launch_linux_app_on_macos": "Unable to launch Linux app on MacOS.",
+      "unable_launch_macos_app_on_other_platform": "Unable to launch MacOS app on a different platform.",
+      "unable_stop_windows_app_on_other_platform": "Unable to stop Windows app on a different platform.",
+      "unable_stop_linux_app_on_macos": "Unable to stop Linux app on MacOS.",
+      "unable_stop_macos_app_on_other_platform": "Unable to stop MacOS app on a different platform.",
+      "system_name_unsafe": "System name includes unsafe characters."
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -94,13 +103,22 @@
       "starting_compilation": "Начинание компиляции...",
       "cleaning": "Очистка...",
       "cleaning_failed": "Не удалось очистить. Вы закрыли приложение/папку?",
-      "downloading": "Скачиваниее...",
+      "downloading": "Скачивание...",
       "unpacking": "Распаковка...",
       "copying": "Копирование файлов...",
       "local_bootloader_not_found": `Файл "bootloader-local.bin" не найден.`,
       "downloading_bootloader": "Скачивание загрузчика...",
       "downloading_kernel": "Скаичвание ядра...",
-      "applying_fixes": "Принятие исправлений..."
+      "applying_fixes": "Принятие исправлений...",
+      "unable_to_find": "Не удалось найти",
+      "did_you_compile_first": "Вы скомпилировали перед этим?",
+      "unable_launch_windows_app_on_other_platform": "Не удалось запустить Windows приложение на другой платформе.",
+      "unable_launch_linux_app_on_macos": "Не удалось запустить Linux приложение на MacOS.",
+      "unable_launch_macos_app_on_other_platform": "Не удалось запустить MacOS приложение на другой платформе.",
+      "unable_stop_windows_app_on_other_platform": "Не удалось остановить Windows приложение на другой платформе.",
+      "unable_stop_linux_app_on_macos": "Не удалось остановить Linux приложение на MacOS.",
+      "unable_stop_macos_app_on_other_platform": "Не удалось остановить MacOS приложение на другой платформе.",
+      "system_name_unsafe": "Название системы содержит небезопасные символы."
     }
   };
 
@@ -575,12 +593,12 @@
 
     if (config.target == "windows-app") {
       if (process.platform != "win32") {
-        document.querySelector("#status").innerText = "Unable to launch Windows app on a different platform.";
+        document.querySelector("#status").innerText = text("unable_launch_windows_app_on_other_platform");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}.exe`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}.exe". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}.exe". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
@@ -591,12 +609,12 @@
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "linux-app") {
       if (process.platform == "darwin") {
-        document.querySelector("#status").innerText = "Unable to launch Linux app on MacOS.";
+        document.querySelector("#status").innerText = text("unable_launch_linux_app_on_macos");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
@@ -613,12 +631,12 @@
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "macos-app") {
       if (process.platform != "darwin") {
-        document.querySelector("#status").innerText = "Unable to launch MacOS app on a different platform.";
+        document.querySelector("#status").innerText = text("unable_launch_macos_app_on_other_platform");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}.app`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}.app". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}.app". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
@@ -640,12 +658,12 @@
 
     if (config.target == "windows-app") {
       if (process.platform != "win32") {
-        document.querySelector("#status").innerText = "Unable to stop Windows app on a different platform.";
+        document.querySelector("#status").innerText = text("unable_stop_windows_app_on_other_platform");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}.exe`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}.exe". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}.exe". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
@@ -656,12 +674,12 @@
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "linux-app") {
       if (process.platform == "darwin") {
-        document.querySelector("#status").innerText = "Unable to stop Linux app on MacOS.";
+        document.querySelector("#status").innerText = text("unable_stop_linux_app_on_macos");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
@@ -678,17 +696,17 @@
       document.querySelector("#status").style.color = "lime";
     } else if (config.target == "macos-app") {
       if (process.platform != "darwin") {
-        document.querySelector("#status").innerText = "Unable to stop MacOS app on a different platform.";
+        document.querySelector("#status").innerText = text("unable_stop_macos_app_on_other_platform");
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (!fs.existsSync(`dist/${name}.app`)) {
-        document.querySelector("#status").innerText = `Unable to find "dist/${name}.app". Did you compile first?`;
+        document.querySelector("#status").innerText = `${text("unable_to_find")} "dist/${name}.app". ${text("did_you_compile_first")}`;
         document.querySelector("#status").style.color = "red";
         return;
       }
       if (name.includes("'")) {
-        document.querySelector("#status").innerText = "System name includes unsafe characters.";
+        document.querySelector("#status").innerText = text("system_name_unsafe");
         document.querySelector("#status").style.color = "red";
         return;
       }
