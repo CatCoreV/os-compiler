@@ -125,7 +125,7 @@
   };
 
   function text(id) {
-    return (texts[config.language][id] || texts["en"][id] || id);
+    return (texts[config.language] ? (texts[config.language][id] || texts["en"][id] || id) : texts["en"][id] || id);
   }
 
   function openModal() {
