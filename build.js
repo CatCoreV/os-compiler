@@ -183,6 +183,11 @@
         return;
       }
       res = await res.json();
+      if (path) {
+        if (!fs.existsSync(path)) {
+          fs.mkdirSync(path);
+        }
+      }
       for (var asset of res) {
         if (asset.type == "file") {
           document.querySelector("#modal-title").innerHTML = `${text("updating")}<br />${asset.path}`;
