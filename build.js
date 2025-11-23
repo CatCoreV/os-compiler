@@ -74,25 +74,30 @@
 
   window.updateCompilerDev = async () => {
     openModal();
-    document.querySelector("#modal-title").innerHTML = "Preparing for<br />updates...";
-    try {
-      var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents`);
-      if (!res.ok) {
-        throw "";
-      }
-    } catch {
-      document.querySelector("#modal-title").innerHTML = "Failed to prepare for<br />updates";
-      document.querySelector("#modal-button").style.display = "block";
-      document.querySelector("#modal-button").innerText = "OK";
-      return;
-    }
-    res = await res.json();
     document.querySelector("#modal-title").innerHTML = "Updating...";
-    for (var asset of res) {
-      if (asset.type == "file") {
-        fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+    async function updateFolder(path) {
+      try {
+        var res = await fetch(`https://api.github.com/repos/CatCoreV/os-compiler/contents/${path}`);
+        if (!res.ok) {
+          throw "";
+        }
+      } catch {
+        document.querySelector("#modal-title").innerHTML = "Failed to prepare for<br />updates";
+        document.querySelector("#modal-button").style.display = "block";
+        document.querySelector("#modal-button").innerText = "OK";
+        return;
+      }
+      res = await res.json();
+      for (var asset of res) {
+        if (asset.type == "file") {
+          fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
+        }
+        if (asset.type == "dir") {
+          await updateFolder(asset.path);
+        }
       }
     }
+    await updateFolder("");
     document.querySelector("#modal-title").innerHTML = `Updated to main branch.`;
     document.querySelector("#modal-button").style.display = "block";
     document.querySelector("#modal-button").innerText = "Restart";
