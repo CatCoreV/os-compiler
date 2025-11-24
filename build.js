@@ -533,6 +533,9 @@
       }
       fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify(systemPackage, null, 2));
       fs.writeFileSync(path.join(dist, "index.html"), html);
+      fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "bin"), {
+        "recursive": true
+      });
       fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "boot"), {
         "recursive": true
       });
