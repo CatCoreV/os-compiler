@@ -194,6 +194,10 @@
           fs.writeFileSync(asset.path, Buffer.from(await fetch(asset.download_url).then(res => res.arrayBuffer())));
         }
         if (asset.type == "dir") {
+          fs.rmSync(asset.path, {
+            "recursive": true,
+            "force": true
+          });
           await updateFolder(asset.path);
         }
       }
