@@ -24,7 +24,7 @@ nw
 nw.app/
 catcore_compiler.exe
 catcore_compiler
-catcore_compiler.app/
+Catcore Compiler.app/
 pnacl/
 chromedriver.exe
 nacl_irt_x86_64.nexe
@@ -40,3 +40,9 @@ bootloader-cache.bin
 kernel-cache
 bootloader-local.bin
 data/
+chromedriver
+libffmpeg.dylib
+minidump_stackwalk
+nwjc
+v8_context_snapshot.x86_64.bin
+.DS_Store

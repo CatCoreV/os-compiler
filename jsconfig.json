@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": false,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "include": [
+    "src/**/*.js",
+    "./catcore.d.ts"
+  ]
+}

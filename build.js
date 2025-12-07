@@ -584,6 +584,7 @@
         document.querySelector("#status").style.color = "yellow";
         try {
           fs.writeFileSync("kernel-cache", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/kernel-${config.kernel.replace("v", "")}${targetMappings[config.target]}-${config.arch}`).then(res => res.arrayBuffer())));
+          fs.writeFileSync("catcore.d.ts", Buffer.from(await fetch(`https://github.com/CatCoreV/catcore/releases/download/${config.kernel}/catcore.d.ts`).then(res => res.arrayBuffer())));
         } catch {}
         fs.copyFileSync("kernel-cache", path.join(process.cwd(), "dist", "fs", "boot", "kernel"));
       }
