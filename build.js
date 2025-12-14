@@ -583,7 +583,10 @@
       if (fs.existsSync(path.join(src, "overlay-fs"))) {
         await copyRecursive(path.join(src, "overlay-fs"), path.join(process.cwd(), "dist", "fs"));
       }
-      var apps = fs.readdirSync(path.join(src, "apps"));
+      var apps = [];
+      if (fs.existsSync(path.join(src, "apps"))) {
+        apps = fs.readdirSync(path.join(src, "apps"));
+      }
       for (var app of apps) {
         var appType = 0;
         var appFile = "";
