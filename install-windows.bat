@@ -2,6 +2,7 @@
 
 setlocal enabledelayedexpansion
 
+set NW_SYSTEM=win
 if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
   set NW_ARCH=x64
   echo Detected: Windows ^(x64^)
@@ -13,7 +14,7 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
   exit /b 1
 )
 
-set URL=https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-win-%NW_ARCH%.zip
+set URL=https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-%NW_SYSTEM%-%NW_ARCH%.zip
 set OUTPUT=nw.zip
 
 echo Downloading %URL%...
