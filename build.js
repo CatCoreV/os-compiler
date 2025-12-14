@@ -583,6 +583,32 @@
       if (fs.existsSync(path.join(src, "overlay-fs"))) {
         await copyRecursive(path.join(src, "overlay-fs"), path.join(process.cwd(), "dist", "fs"));
       }
+      var apps = fs.readdirSync(path.join(src, "apps"));
+      for (var app of apps) {
+        var appType = 0;
+        var appFile = "";
+        if (fs.existsSync(path.join(src, "apps", app, "app.js"))) {
+          appType = 3;
+          appFile = "app.js";
+        }
+        if (fs.existsSync(path.join(src, "apps", app, "app.py"))) {
+          appType = 4;
+          appFile = "app.py";
+        }
+        if (fs.existsSync(path.join(src, "apps", app, "app.php"))) {
+          appType = 5;
+          appFile = "app.php";
+        }
+        if (fs.existsSync(path.join(src, "apps", app, "app.rb"))) {
+          appType = 6;
+          appFile = "app.rb";
+        }
+        var compiled = Buffer.from(btoa(encodeURIComponent(JSON.stringify(Object.assign(JSON.parse(fs.readFileSync(path.join(src, "apps", app, "app.json")).toString("utf-8")), {
+          "code": (appFile ? fs.readFileSync(path.join(src, "apps", app, appFile)).toString("utf-8") : "")
+        })))).split("").reverse().join(""));
+        compiled = Buffer.concat([Buffer.from([0x62, 0x80, 0x62, 0x80, 0x02, appType, 0]), compiled]);
+        fs.writeFileSync(path.join(process.cwd(), "dist", "fs", "bin", `${app}.app`), compiled);
+      }
       if (!system.logo) {
         fs.copyFileSync("catcore.png", path.join(dist, "catcore.png"));
       }
