@@ -590,6 +590,9 @@
         apps = fs.readdirSync(path.join(src, "apps"));
       }
       for (var app of apps) {
+        if (app == ".DS_Store") {
+          continue;
+        }
         var appType = 0;
         var appFile = "";
         if (fs.existsSync(path.join(src, "apps", app, "app.js"))) {
