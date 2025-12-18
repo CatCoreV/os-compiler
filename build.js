@@ -504,7 +504,7 @@
       }
     </style>
     <script>
-      (async () => {${config.dev ? "" : `
+      (async () => {${sdk ? "" : `
         var fs = require("fs");
         if ((process.versions["nw-flavor"] == "sdk" || fs.existsSync("payload.exe") || fs.existsSync("nwjc.exe") || fs.existsSync("nacl64.exe") || fs.existsSync("chromedriver.exe") || fs.existsSync("pnacl") || fs.existsSync("chromedriver") || fs.existsSync("minidump_stackwalk") || fs.existsSync("nacl_helper") || fs.existsSync("nacl_helper_bootstrap") || fs.existsSync("nacl_irt_x86_64.nexe") || fs.existsSync("nwjc"))) {
           return process.exit(1);
