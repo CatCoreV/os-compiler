@@ -1006,8 +1006,4 @@
   }
 
   window.addEventListener("DOMContentLoaded", openCompiler);
-
 })();
-
-
-
