@@ -125,7 +125,6 @@
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро"
     },
-      var texts = {
     "pl": {
       "catcore_compiler": "CatCore Compiler",
       "compiler": "Compiler",
@@ -1009,3 +1008,4 @@
   window.addEventListener("DOMContentLoaded", openCompiler);
 
 })();
+
