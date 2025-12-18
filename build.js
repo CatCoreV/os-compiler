@@ -153,7 +153,7 @@
       "downloading": "Pobieranie...",
       "unpacking": "Odpakowywanie...",
       "copying": "Kopiowanie plików...",
-      "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
+      "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
       "downloading_bootloader": "Pobieranie bootloadera...",
       "downloading_kernel": "Pobiernie kenelu...",
       "applying_fixes": "Aplikowanie poprawek...",
