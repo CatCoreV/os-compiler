@@ -166,7 +166,7 @@
       "unable_stop_linux_app_on_macos": "Niemożna zatrzymać aplikacji Linux na macOS.",
       "unable_stop_macos_app_on_other_platform": "Niemożna zatrzymać aplikacji macOS na innej platformie.",
       "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
-      "quick": "Szybka kompilacja"
+      "quick": "Tryb szybki."
     }
   };
 
@@ -1008,4 +1008,5 @@
   window.addEventListener("DOMContentLoaded", openCompiler);
 
 })();
+
 
