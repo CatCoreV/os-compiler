@@ -80,7 +80,8 @@
       "unable_stop_linux_app_on_macos": "Unable to stop Linux app on MacOS.",
       "unable_stop_macos_app_on_other_platform": "Unable to stop MacOS app on a different platform.",
       "system_name_unsafe": "System name includes unsafe characters.",
-      "quick": "Quick"
+      "quick": "Quick",
+      "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation"
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -123,7 +124,8 @@
       "unable_stop_linux_app_on_macos": "Не удалось остановить Linux приложение на MacOS.",
       "unable_stop_macos_app_on_other_platform": "Не удалось остановить MacOS приложение на другой платформе.",
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
-      "quick": "Быстро"
+      "quick": "Быстро",
+      "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию"
     },
     "pl": {
       "catcore_compiler": "CatCore Compiler",
@@ -362,6 +364,14 @@
         document.querySelector("#compile").classList.remove("disabled");
         return;
       }
+    }
+
+    if (config.target == "windows-app" && config.arch == "arm64") {
+      document.querySelector("#status").innerText = text("windows_arm64_unsupported");
+      document.querySelector("#status").style.color = "red";
+      compiling = false;
+      document.querySelector("#compile").classList.remove("disabled");
+      return;
     }
 
     // If target is an app, download and unpack nw
