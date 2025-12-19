@@ -9,9 +9,12 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 ) else if "%PROCESSOR_ARCHITECTURE%"=="x86" (
   set NW_ARCH=ia32
   echo Detected: Windows ^(x86^)
+) else if "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
+  set NW_ARCH=x64
+  echo Detected: Windows ^(ARM64^)
 ) else (
   echo ERROR: Unsupported architecture: %PROCESSOR_ARCHITECTURE%
-  exit /b 1
+  pause
 )
 
 set URL=https://github.com/CatCoreV/os-compiler/releases/download/nw/catcore-nw-%NW_SYSTEM%-%NW_ARCH%.zip
