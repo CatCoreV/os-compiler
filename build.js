@@ -139,13 +139,13 @@
       "windowed": "W oknie",
       "ready": "Gotowe!",
       "compile": "KOMPILUJ!",
-      "checking_updates": "Sprawdzanie <br />updates...",
-      "update_checking_failed": "Nie udane sprawdzenie <br />updates",
+      "checking_updates": "Sprawdzanie<br />updates...",
+      "update_checking_failed": "Nie udane sprawdzenie<br />updates",
       "latest_version": "Używasz<br />the latest version!",
       "updating": "Aktualizowanie...",
       "updated": "Zaktualizowano.",
       "restart": "Restart",
-      "update_failed": "Niepowodzenie <br />update",
+      "update_failed": "Niepowodzenie<br />update",
       "updated_dev": "Zaktualizowano do main branch.",
       "starting_compilation": "Zaczęto kompilacje...",
       "cleaning": "Czyszczenie...",
@@ -1007,3 +1007,4 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
+
