@@ -1018,6 +1018,3 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
-
-
-
