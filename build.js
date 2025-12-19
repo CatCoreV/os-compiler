@@ -169,6 +169,7 @@
       "unable_stop_macos_app_on_other_platform": "Niemożna zatrzymać aplikacji macOS na innej platformie.",
       "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
       "quick": "Tryb szybki"
+      "windows_arm64_unsupported": "Kompilacja na Windows ARM64 jest niewspierana, skompiluj dla x64 i użyj emulatora"
     }
   };
 
@@ -1017,4 +1018,5 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
+
 
