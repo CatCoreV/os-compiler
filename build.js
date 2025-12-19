@@ -4,7 +4,8 @@
   var path = require("path");
   var child_process = require("child_process");
   var supportedLanguages = [
-    [["ru", "ru-RU", "ru-UA", "uk", "uk_UA"], "ru"],
+    [["ru", "ru-RU", "ru-UA",  "uk", "uk-UA"], "ru"],
+    [["pl", "pl_PL"], "pl"],
     ["en"]
   ];
   var config = {
@@ -123,6 +124,49 @@
       "unable_stop_macos_app_on_other_platform": "Не удалось остановить MacOS приложение на другой платформе.",
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро"
+    },
+    "pl": {
+      "catcore_compiler": "CatCore Compiler",
+      "compiler": "Compiler",
+      "kernel": "Kernel",
+      "system": "System",
+      "result": "Rezultat",
+      "web": "Strona WWW",
+      "windows_app": "Aplikacja na Windows",
+      "linux_app": "Aplikacja na Linux",
+      "macos_app": "Aplikacja na macOS",
+      "bootable_iso": "Bootowalne .iso",
+      "windowed": "W oknie",
+      "ready": "Gotowe!",
+      "compile": "KOMPILUJ!",
+      "checking_updates": "Sprawdzanie<br />updates...",
+      "update_checking_failed": "Nie udane sprawdzenie<br />updates",
+      "latest_version": "Używasz<br />the latest version!",
+      "updating": "Aktualizowanie...",
+      "updated": "Zaktualizowano.",
+      "restart": "Restart",
+      "update_failed": "Niepowodzenie<br />update",
+      "updated_dev": "Zaktualizowano do main branch.",
+      "starting_compilation": "Zaczęto kompilacje...",
+      "cleaning": "Czyszczenie...",
+      "cleaning_failed": "Niepowodzenie czyszczenia. Czy zamknąłeś aplikacja/folder?",
+      "downloading": "Pobieranie...",
+      "unpacking": "Odpakowywanie...",
+      "copying": "Kopiowanie plików...",
+      "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
+      "downloading_bootloader": "Pobieranie bootloadera...",
+      "downloading_kernel": "Pobiernie kenelu...",
+      "applying_fixes": "Aplikowanie poprawek...",
+      "unable_to_find": "Nie udało się znaleść",
+      "did_you_compile_first": "Czy skompilowałeś przed?",
+      "unable_launch_windows_app_on_other_platform": "Nie można uruchomić aplikacji Windows na innej platformie.",
+      "unable_launch_linux_app_on_macos": "Nie można uruchomić aplikacji Linux na macOS.",
+      "unable_launch_macos_app_on_other_platform": "Niemożna uruchomić aplikacji macOS na innej platformie.",
+      "unable_stop_windows_app_on_other_platform": "Niemożna zatrzymać aplikacji Windows na innej platformie.",
+      "unable_stop_linux_app_on_macos": "Niemożna zatrzymać aplikacji Linux na macOS.",
+      "unable_stop_macos_app_on_other_platform": "Niemożna zatrzymać aplikacji macOS na innej platformie.",
+      "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
+      "quick": "Tryb szybki"
     }
   };
 
@@ -963,3 +1007,4 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
+
