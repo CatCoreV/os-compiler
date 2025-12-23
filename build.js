@@ -11,7 +11,7 @@
   var config = {
     "language": supportedLanguages.find(lang => (lang.length < 2 || lang[0].includes(navigator.language))).at(-1),
     "kernel": "Unknown",
-    "arch": (["x64", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
+    "arch": (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
     "source": "src",
     "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`,
     "windowed": false
@@ -82,7 +82,9 @@
       "unable_stop_macos_app_on_other_platform": "Unable to stop MacOS app on a different platform.",
       "system_name_unsafe": "System name includes unsafe characters.",
       "quick": "Quick",
-      "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation"
+      "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation",
+      "linux_x86_unsupported": "Linux x86 compilation target is unsupported",
+      "macos_x86_unsupported": "MacOS x86 compilation target is unsupported"
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -127,7 +129,9 @@
       "unable_stop_macos_app_on_other_platform": "Не удалось остановить MacOS приложение на другой платформе.",
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро",
-      "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию"
+      "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию",
+      "linux_x86_unsupported": "Цель компиляции Linux x86 не поддерживается",
+      "macos_x86_unsupported": "Цель компиляции MacOS x86 не поддерживается"
     },
     "pl": {
       "catcore_compiler": "CatCore Compiler",
@@ -371,6 +375,20 @@
 
     if (config.target == "windows-app" && config.arch == "arm64") {
       document.querySelector("#status").innerText = text("windows_arm64_unsupported");
+      document.querySelector("#status").style.color = "red";
+      compiling = false;
+      document.querySelector("#compile").classList.remove("disabled");
+      return;
+    }
+    if (config.target == "linux-app" && config.arch == "x86") {
+      document.querySelector("#status").innerText = text("linux_x86_unsupported");
+      document.querySelector("#status").style.color = "red";
+      compiling = false;
+      document.querySelector("#compile").classList.remove("disabled");
+      return;
+    }
+    if (config.target == "macos-app" && config.arch == "x86") {
+      document.querySelector("#status").innerText = text("macos_x86_unsupported");
       document.querySelector("#status").style.color = "red";
       compiling = false;
       document.querySelector("#compile").classList.remove("disabled");
@@ -964,6 +982,7 @@
             <br />
             <select class="input" id="arch">
               <option value="x64" selected>x64</option>
+              <option value="x86">x86</option>
               <option value="arm64">ARM64</option>
             </select>
           </div>
