@@ -83,7 +83,6 @@
       "system_name_unsafe": "System name includes unsafe characters.",
       "quick": "Quick",
       "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation",
-      "linux_x86_unsupported": "Linux x86 compilation target is unsupported",
       "macos_x86_unsupported": "MacOS x86 compilation target is unsupported"
     },
     "ru": {
@@ -130,7 +129,6 @@
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро",
       "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию",
-      "linux_x86_unsupported": "Цель компиляции Linux x86 не поддерживается",
       "macos_x86_unsupported": "Цель компиляции MacOS x86 не поддерживается"
     },
     "pl": {
@@ -375,13 +373,6 @@
 
     if (config.target == "windows-app" && config.arch == "arm64") {
       document.querySelector("#status").innerText = text("windows_arm64_unsupported");
-      document.querySelector("#status").style.color = "red";
-      compiling = false;
-      document.querySelector("#compile").classList.remove("disabled");
-      return;
-    }
-    if (config.target == "linux-app" && config.arch == "x86") {
-      document.querySelector("#status").innerText = text("linux_x86_unsupported");
       document.querySelector("#status").style.color = "red";
       compiling = false;
       document.querySelector("#compile").classList.remove("disabled");
