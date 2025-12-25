@@ -48,7 +48,7 @@
       "web": "Website",
       "windows_app": "Windows app",
       "linux_app": "Linux app",
-      "macos_app": "MacOS app",
+      "macos_app": "macOS app",
       "bootable_iso": "Bootable .iso",
       "windowed": "Windowed",
       "ready": "Ready!",
@@ -75,15 +75,15 @@
       "unable_to_find": "Unable to find",
       "did_you_compile_first": "Did you compile first?",
       "unable_launch_windows_app_on_other_platform": "Unable to launch Windows app on a different platform.",
-      "unable_launch_linux_app_on_macos": "Unable to launch Linux app on MacOS.",
-      "unable_launch_macos_app_on_other_platform": "Unable to launch MacOS app on a different platform.",
+      "unable_launch_linux_app_on_macos": "Unable to launch Linux app on macOS.",
+      "unable_launch_macos_app_on_other_platform": "Unable to launch macOS app on a different platform.",
       "unable_stop_windows_app_on_other_platform": "Unable to stop Windows app on a different platform.",
-      "unable_stop_linux_app_on_macos": "Unable to stop Linux app on MacOS.",
-      "unable_stop_macos_app_on_other_platform": "Unable to stop MacOS app on a different platform.",
+      "unable_stop_linux_app_on_macos": "Unable to stop Linux app on macOS.",
+      "unable_stop_macos_app_on_other_platform": "Unable to stop macOS app on a different platform.",
       "system_name_unsafe": "System name includes unsafe characters.",
       "quick": "Quick",
       "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation",
-      "macos_x86_unsupported": "MacOS x86 compilation target is unsupported"
+      "macos_x86_unsupported": "macOS x86 compilation target is unsupported"
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -94,7 +94,7 @@
       "web": "Веб-сайт",
       "windows_app": "Windows приложение",
       "linux_app": "Linux приложение",
-      "macos_app": "MacOS приложение",
+      "macos_app": "macOS приложение",
       "bootable_iso": "Загрузочный .iso",
       "windowed": "Оконный",
       "ready": "Готов!",
@@ -121,15 +121,15 @@
       "unable_to_find": "Не удалось найти",
       "did_you_compile_first": "Вы скомпилировали перед этим?",
       "unable_launch_windows_app_on_other_platform": "Не удалось запустить Windows приложение на другой платформе.",
-      "unable_launch_linux_app_on_macos": "Не удалось запустить Linux приложение на MacOS.",
-      "unable_launch_macos_app_on_other_platform": "Не удалось запустить MacOS приложение на другой платформе.",
+      "unable_launch_linux_app_on_macos": "Не удалось запустить Linux приложение на macOS.",
+      "unable_launch_macos_app_on_other_platform": "Не удалось запустить macOS приложение на другой платформе.",
       "unable_stop_windows_app_on_other_platform": "Не удалось остановить Windows приложение на другой платформе.",
-      "unable_stop_linux_app_on_macos": "Не удалось остановить Linux приложение на MacOS.",
-      "unable_stop_macos_app_on_other_platform": "Не удалось остановить MacOS приложение на другой платформе.",
+      "unable_stop_linux_app_on_macos": "Не удалось остановить Linux приложение на macOS.",
+      "unable_stop_macos_app_on_other_platform": "Не удалось остановить macOS приложение на другой платформе.",
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро",
       "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию",
-      "macos_x86_unsupported": "Цель компиляции MacOS x86 не поддерживается"
+      "macos_x86_unsupported": "Цель компиляции macOS x86 не поддерживается"
     },
     "pl": {
       "catcore_compiler": "CatCore Compiler",
@@ -1058,4 +1058,3 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
-
