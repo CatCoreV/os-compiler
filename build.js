@@ -901,7 +901,7 @@
         document.querySelector("#status").style.color = "red";
         return;
       }
-      child_process.exec(`kill -9 $(ps -eo pid,command | grep 'dist/${name}.app/Contents/macOS/nwjs' | grep -v grep | awk '{print $1}')`);
+      child_process.exec(`kill -9 $(ps -eo pid,command | grep 'dist/${name}.app/Contents/MacOS/nwjs' | grep -v grep | awk '{print $1}')`);
       document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
     }
@@ -1054,4 +1054,5 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
+
 
