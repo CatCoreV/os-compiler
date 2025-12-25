@@ -161,7 +161,8 @@
       "copying": "Kopiowanie plików...",
       "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
       "downloading_bootloader": "Pobieranie bootloadera...",
-      "downloading_kernel": "Pobiernie kenelu...",
+      "downloading_kernel": "Pobieranie kernela...",
+      "downloading_kexts": "Pobieranie kextów...",
       "applying_fixes": "Aplikowanie poprawek...",
       "unable_to_find": "Nie udało się znaleść",
       "did_you_compile_first": "Czy skompilowałeś przed?",
@@ -173,7 +174,8 @@
       "unable_stop_macos_app_on_other_platform": "Niemożna zatrzymać aplikacji macOS na innej platformie.",
       "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
       "quick": "Tryb szybki",
-      "windows_arm64_unsupported": "Kompilacja dla Windows ARM64 jest niewspierana, skompiluj dla x64 i użyj emulatora"
+      "windows_arm64_unsupported": "Kompilacja dla Windows ARM64 jest niewspierana, skompiluj dla x64 i użyj emulatora",
+      "macos_x86_unsupported": "Kompilacja dla macOS x86 jest niewspierana"
     }
   };
 
@@ -1054,5 +1056,4 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
-
 
