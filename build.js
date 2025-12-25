@@ -161,7 +161,7 @@
       "copying": "Kopiowanie plików...",
       "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
       "downloading_bootloader": "Pobieranie bootloadera...",
-      "downloading_kernel": "Pobiernie kernela...",
+      "downloading_kernel": "Pobieranie kernela...",
       "downloading_kexts": "Pobieranie kextów...",
       "applying_fixes": "Aplikowanie poprawek...",
       "unable_to_find": "Nie udało się znaleść",
@@ -1056,3 +1056,4 @@
 
   window.addEventListener("DOMContentLoaded", openCompiler);
 })();
+
