@@ -38,6 +38,7 @@ node_modules/
 package-lock.json
 bootloader-cache.bin
 kernel-cache
+kexts-cache.zip
 bootloader-local.bin
 data/
 chromedriver

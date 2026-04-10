@@ -83,7 +83,8 @@
       "system_name_unsafe": "System name includes unsafe characters.",
       "quick": "Quick",
       "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation",
-      "macos_x86_unsupported": "MacOS x86 compilation target is unsupported"
+      "macos_x86_unsupported": "MacOS x86 compilation target is unsupported",
+      "invalid_app_json": `Your app "%" contains an invalid "app.json" file.`
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -129,7 +130,8 @@
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро",
       "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию",
-      "macos_x86_unsupported": "Цель компиляции MacOS x86 не поддерживается"
+      "macos_x86_unsupported": "Цель компиляции MacOS x86 не поддерживается",
+      "invalid_app_json": `Ваше приложение "%" содержит неверный файл "app.json".`
     },
     "pl": {
       "catcore_compiler": "CatCore Compiler",
@@ -677,10 +679,18 @@
           appType = 6;
           appFile = "app.rb";
         }
-        var compiled = Buffer.from(btoa(encodeURIComponent(JSON.stringify(Object.assign(JSON.parse(fs.readFileSync(path.join(src, "apps", app, "app.json")).toString("utf-8")), {
-          "name": app,
-          "code": (appFile ? fs.readFileSync(path.join(src, "apps", app, appFile)).toString("utf-8") : "")
-        })))).split("").reverse().join(""));
+        try {
+          var compiled = Buffer.from(btoa(encodeURIComponent(JSON.stringify(Object.assign(JSON.parse(fs.readFileSync(path.join(src, "apps", app, "app.json")).toString("utf-8")), {
+            "name": app,
+            "code": (appFile ? fs.readFileSync(path.join(src, "apps", app, appFile)).toString("utf-8") : "")
+          })))).split("").reverse().join(""));
+        } catch {
+          document.querySelector("#status").innerText = text("invalid_app_json").replace("%", app);
+          document.querySelector("#status").style.color = "red";
+          compiling = false;
+          document.querySelector("#compile").classList.remove("disabled");
+          return;          
+        }
         compiled = Buffer.concat([Buffer.from([0x62, 0x80, 0x62, 0x80, 0x02, appType, 0]), compiled]);
         fs.writeFileSync(path.join(process.cwd(), "dist", "fs", "bin", `${app}.app`), compiled);
       }
