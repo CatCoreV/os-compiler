@@ -631,6 +631,10 @@
           "recursive": true,
           "force": true
         });
+        fs.rmSync(path.join(process.cwd(), "dist", "fs", "lib"), {
+          "recursive": true,
+          "force": true
+        });
       }
       fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "bin"), {
         "recursive": true
@@ -642,6 +646,9 @@
         "recursive": true
       });
       fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "system"), {
+        "recursive": true
+      });
+      fs.mkdirSync(path.join(process.cwd(), "dist", "fs", "lib"), {
         "recursive": true
       });
       if (!quick) {
