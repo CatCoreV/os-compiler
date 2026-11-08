@@ -73,4 +73,5 @@ if [ "$NW_SYSTEM" == "macos" ]; then
 else
   mv nw catcore_compiler
   chmod +x catcore_compiler
+  chmod +x chrome_crashpad_handler
 fi
