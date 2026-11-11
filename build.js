@@ -162,7 +162,7 @@
       "local_bootloader_not_found": `Plik "bootloader-local.bin" nie został znaleziony.`,
       "downloading_bootloader": "Pobieranie bootloadera...",
       "downloading_kernel": "Pobieranie kernela...",
-      "downloading_kexts": "Pobieranie kextów...",
+      "downloading_kexts": "Pobieranie rozszerzeń kernela...",
       "applying_fixes": "Aplikowanie poprawek...",
       "unable_to_find": "Nie udało się znaleść",
       "did_you_compile_first": "Czy skompilowałeś przed?",
