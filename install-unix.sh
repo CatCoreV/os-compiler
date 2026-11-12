@@ -30,11 +30,6 @@ case "$OSTYPE" in
         NW_ARCH="x64"
         echo "Detected: Linux (x64)"
         ;;
-      i686|i386)
-        NW_SYSTEM="linux"
-        NW_ARCH="ia32"
-        echo "Detected: Linux (x86)"
-        ;;
       aarch64|arm64)
         NW_SYSTEM="linux"
         NW_ARCH="arm64"
