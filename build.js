@@ -446,9 +446,11 @@
       if (process.platform == "win32" && !fs.existsSync(path.join(process.cwd(), "xorriso"))) {
         fs.writeFileSync(path.join(process.cwd(), "xorriso.zip"), Buffer.from(await fetch("https://github.com/CatCoreV/os-compiler/releases/download/iso/xorriso-windows.zip").then(res => res.arrayBuffer())));
         fs.mkdirSync(path.join(process.cwd(), "xorriso"));
-        child_process.exec("tar -xf ../xorriso.zip", {
-          "cwd": path.join(process.cwd(), "xorriso")
-        }, res);
+        await new Promise(res => {
+          child_process.exec("tar -xf ../xorriso.zip", {
+            "cwd": path.join(process.cwd(), "xorriso")
+          }, res);
+        });
         fs.unlinkSync(path.join(process.cwd(), "xorriso.zip"));
       }
     }
