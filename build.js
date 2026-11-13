@@ -82,7 +82,7 @@
       "unable_stop_macos_app_on_other_platform": "Unable to stop macOS app on a different platform.",
       "system_name_unsafe": "System name includes unsafe characters.",
       "quick": "Quick",
-      "windows_arm64_unsupported": "Windows ARM64 compilation target is unsupported, compile for x64 and use emulation",
+      "linux_x86_unsupported": "Linux x86 compilation target is unsupported",
       "macos_x86_unsupported": "macOS x86 compilation target is unsupported",
       "invalid_app_json": `Your app "%" contains an invalid "app.json" file.`
     },
@@ -129,7 +129,7 @@
       "unable_stop_macos_app_on_other_platform": "Не удалось остановить macOS приложение на другой платформе.",
       "system_name_unsafe": "Название системы содержит небезопасные символы.",
       "quick": "Быстро",
-      "windows_arm64_unsupported": "Цель компиляции Windows ARM64 не поддерживается, скомпилируйте для x64 и используйте эмуляцию",
+      "linux_x86_unsupported": "Цель компиляции Linux x86 не поддерживается",
       "macos_x86_unsupported": "Цель компиляции macOS x86 не поддерживается",
       "invalid_app_json": `Ваше приложение "%" содержит неверный файл "app.json".`
     },
@@ -176,7 +176,7 @@
       "unable_stop_macos_app_on_other_platform": "Niemożna zatrzymać aplikacji macOS na innej platformie.",
       "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
       "quick": "Tryb szybki",
-      "windows_arm64_unsupported": "Kompilacja dla Windows ARM64 jest niewspierana, skompiluj dla x64 i użyj emulatora",
+      "linux_x86_unsupported": "Kompilacja dla Linux x86 jest niewspierana",
       "macos_x86_unsupported": "Kompilacja dla macOS x86 jest niewspierana"
     }
   };
@@ -375,8 +375,8 @@
       }
     }
 
-    if (config.target == "windows-app" && config.arch == "arm64") {
-      document.querySelector("#status").innerText = text("windows_arm64_unsupported");
+    if (config.target == "linux-app" && config.arch == "x86") {
+      document.querySelector("#status").innerText = text("linux_x86_unsupported");
       document.querySelector("#status").style.color = "red";
       compiling = false;
       document.querySelector("#compile").classList.remove("disabled");
