@@ -845,7 +845,7 @@
         fs.renameSync(path.join(process.cwd(), "dist", element), path.join(process.cwd(), "dist", "iso", element));
       });
       fs.copyFileSync(path.join(process.cwd(), "platforms", `base-${config.arch}.iso`), path.join(process.cwd(), "dist", "base.iso"));
-      var xorrisoLog = await new Promise(res => child_process.exec(`${process.platform == "win32" ? "xorriso/" : ""}xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
+      var xorrisoLog = await new Promise(res => child_process.exec(`${process.platform == "win32" ? "..\\xorriso\\" : ""}xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
         "cwd": path.join(process.cwd(), "dist")
       }, res));
       if (!fs.existsSync(path.join(process.cwd(), "dist", `${name}-${config.arch}.iso`))) {
