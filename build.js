@@ -1018,7 +1018,6 @@
             <br />
             <br />
             <select class="input" id="target">
-              <option value="web" disabled>${text("web")}</option>
               <option value="windows-app">${text("windows_app")}</option>
               <option value="linux-app">${text("linux_app")}</option>
               <option value="macos-app">${text("macos_app")}</option>
