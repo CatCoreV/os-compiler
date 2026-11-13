@@ -362,10 +362,7 @@
     config.source = document.querySelector("#source").value;
     config.target = document.querySelector("#target").value;
     config.windowed = document.querySelector("#windowed").checked;
-    var sdk = document.querySelector("#sdk").checked;
-    if (!config.dev) {
-      sdk = false;
-    }
+    var sdk = config.dev ? document.querySelector("#sdk").checked : false;
     var quick = document.querySelector("#quick").checked;
     if (config.target == "iso") {
       config.windowed = false;
