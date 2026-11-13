@@ -87,7 +87,9 @@
       "linux_x86_unsupported": "Linux x86 compilation target is unsupported",
       "macos_x86_unsupported": "macOS x86 compilation target is unsupported",
       "iso_x86_unsupported": "ISO x86 compilation target is unsupported",
-      "invalid_app_json": `Your app "%" contains an invalid "app.json" file.`
+      "invalid_app_json": `Your app "%" contains an invalid "app.json" file.`,
+      "iso_failed_unknown": "Packaging ISO failed. Please report this to CatCore.",
+      "iso_failed_xorriso": "Packaging ISO failed. Make sure you have Xorriso installed."
     },
     "ru": {
       "catcore_compiler": "Компилятор CatCore",
@@ -136,7 +138,9 @@
       "linux_x86_unsupported": "Цель компиляции Linux x86 не поддерживается",
       "macos_x86_unsupported": "Цель компиляции macOS x86 не поддерживается",
       "iso_x86_unsupported": "Цель компиляции ISO x86 не поддерживается",
-      "invalid_app_json": `Ваше приложение "%" содержит неверный файл "app.json".`
+      "invalid_app_json": `Ваше приложение "%" содержит неверный файл "app.json".`,
+      "iso_failed_unknown": "Упаковка ISO не удалась. Пожалуйста, напишите об этом в CatCore.",
+      "iso_failed_xorriso": "Упаковка ISO не удалась. Убедитесь, что Xorriso установлен."
     },
     "pl": {
       "catcore_compiler": "CatCore Compiler",
@@ -185,7 +189,9 @@
       "linux_x86_unsupported": "Kompilacja dla Linux x86 jest niewspierana",
       "macos_x86_unsupported": "Kompilacja dla macOS x86 jest niewspierana",
       "iso_x86_unsupported": "Kompilacja dla ISO x86 jest niewspierana",
-      "invalid_app_json": `Twoja aplikacja "%" zawiera nieprawidłowy plik "app.json".`
+      "invalid_app_json": `Twoja aplikacja "%" zawiera nieprawidłowy plik "app.json".`,
+      "iso_failed_unknown": "Pakowanie ISO nie powiodło się. Zgłoś ten problem do CatCore.",
+      "iso_failed_xorriso": "Pakowanie ISO nie powiodło się. Upewnij się, że masz zainstalowane Xorriso."
     }
   };
 
@@ -828,9 +834,24 @@
         fs.renameSync(path.join(process.cwd(), "dist", element), path.join(process.cwd(), "dist", "iso", element));
       });
       fs.copyFileSync(path.join(process.cwd(), "platforms", `base-${config.arch}.iso`), path.join(process.cwd(), "dist", "base.iso"));
-      await new Promise(res => child_process.exec(`xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
+      var xorrisoLog = await new Promise(res => child_process.exec(`xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
         "cwd": path.join(process.cwd(), "dist")
       }, res));
+      if (!fs.existsSync(path.join(process.cwd(), "dist", `${name}-${config.arch}.iso`))) {
+        console.log(xorrisoLog);
+        if (process.platform == "win32") {
+          document.querySelector("#status").innerText = text("iso_failed_unknown");
+          document.querySelector("#status").style.color = "red";
+          compiling = false;
+          document.querySelector("#compile").classList.remove("disabled");
+          return;
+        }
+        document.querySelector("#status").innerText = text("iso_failed_xorriso");
+        document.querySelector("#status").style.color = "red";
+        compiling = false;
+        document.querySelector("#compile").classList.remove("disabled");
+        return;
+      }
       fs.rmSync(path.join(process.cwd(), "dist", "iso"), {
         "recursive": true,
         "force": true
