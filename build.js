@@ -1,8 +1,8 @@
 (async () => {
   var compiler = require("./package.json");
-  var fs = require("fs");
-  var path = require("path");
-  var child_process = require("child_process");
+  var fs = require("node:fs");
+  var path = require("node:path");
+  var child_process = require("node:child_process");
   var supportedLanguages = [
     [["ru", "ru-RU", "ru-UA",  "uk", "uk-UA"], "ru"],
     [["pl", "pl_PL"], "pl"],
@@ -36,7 +36,8 @@
   var targetMappings = {
     "windows-app": "w",
     "linux-app": "n",
-    "macos-app": "d"
+    "macos-app": "d",
+    "iso": "n"
   };
   var texts = {
     "en": {
@@ -72,6 +73,7 @@
       "downloading_kernel": "Downloading kernel...",
       "downloading_kexts": "Downloading kernel extensions...",
       "applying_fixes": "Applying fixes...",
+      "packaging_iso": "Packaging ISO...",
       "unable_to_find": "Unable to find",
       "did_you_compile_first": "Did you compile first?",
       "unable_launch_windows_app_on_other_platform": "Unable to launch Windows app on a different platform.",
@@ -84,6 +86,7 @@
       "quick": "Quick",
       "linux_x86_unsupported": "Linux x86 compilation target is unsupported",
       "macos_x86_unsupported": "macOS x86 compilation target is unsupported",
+      "iso_x86_unsupported": "ISO x86 compilation target is unsupported",
       "invalid_app_json": `Your app "%" contains an invalid "app.json" file.`
     },
     "ru": {
@@ -119,6 +122,7 @@
       "downloading_kernel": "Скачивание ядра...",
       "downloading_kexts": "Скачивание расширений ядра...",
       "applying_fixes": "Принятие исправлений...",
+      "packaging_iso": "Упаковка ISO...",
       "unable_to_find": "Не удалось найти",
       "did_you_compile_first": "Вы скомпилировали перед этим?",
       "unable_launch_windows_app_on_other_platform": "Не удалось запустить Windows приложение на другой платформе.",
@@ -131,6 +135,7 @@
       "quick": "Быстро",
       "linux_x86_unsupported": "Цель компиляции Linux x86 не поддерживается",
       "macos_x86_unsupported": "Цель компиляции macOS x86 не поддерживается",
+      "iso_x86_unsupported": "Цель компиляции ISO x86 не поддерживается",
       "invalid_app_json": `Ваше приложение "%" содержит неверный файл "app.json".`
     },
     "pl": {
@@ -166,6 +171,7 @@
       "downloading_kernel": "Pobieranie kernela...",
       "downloading_kexts": "Pobieranie rozszerzeń kernela...",
       "applying_fixes": "Aplikowanie poprawek...",
+      "packaging_iso": "Pakowanie ISO...",
       "unable_to_find": "Nie udało się znaleść",
       "did_you_compile_first": "Czy skompilowałeś przed?",
       "unable_launch_windows_app_on_other_platform": "Nie można uruchomić aplikacji Windows na innej platformie.",
@@ -177,7 +183,9 @@
       "system_name_unsafe": "Nazwa systemu zawiera niedozwolone znaki.",
       "quick": "Tryb szybki",
       "linux_x86_unsupported": "Kompilacja dla Linux x86 jest niewspierana",
-      "macos_x86_unsupported": "Kompilacja dla macOS x86 jest niewspierana"
+      "macos_x86_unsupported": "Kompilacja dla macOS x86 jest niewspierana",
+      "iso_x86_unsupported": "Kompilacja dla ISO x86 jest niewspierana",
+      "invalid_app_json": `Twoja aplikacja "%" zawiera nieprawidłowy plik "app.json".`
     }
   };
 
@@ -297,6 +305,13 @@
   }
 
   async function downloadPlatform(system, arch, sdk) {
+    if (system == "iso") {
+      if (fs.existsSync(`platforms/base-${arch}.iso`)) {
+        return;
+      }
+      fs.writeFileSync(`platforms/base-${arch}.iso`, Buffer.from(await fetch(`https://github.com/CatCoreV/os-compiler/releases/download/iso/base-${arch}.iso`).then(res => res.arrayBuffer())));
+      return;
+    }
     if (system == "windows") {
       system = "win";
     }
@@ -346,6 +361,11 @@
       sdk = false;
     }
     var quick = document.querySelector("#quick").checked;
+    if (config.target == "iso") {
+      config.windowed = false;
+      sdk = false;
+      quick = false;
+    }
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
 
     // Clean last compilation
@@ -389,6 +409,13 @@
       document.querySelector("#compile").classList.remove("disabled");
       return;
     }
+    if (config.target == "iso" && config.arch == "x86") {
+      document.querySelector("#status").innerText = text("iso_x86_unsupported");
+      document.querySelector("#status").style.color = "red";
+      compiling = false;
+      document.querySelector("#compile").classList.remove("disabled");
+      return;
+    }
 
     // If target is an app, download and unpack nw
     if (!quick && config.target.match(/^(windows|linux|macos)-app$/)) {
@@ -402,6 +429,13 @@
           "cwd": path.join(process.cwd(), "dist")
         }, res);
       });
+    }
+
+    // If target is an iso, download base iso
+    if (config.target == "iso") {
+      document.querySelector("#status").innerText = text("downloading");
+      document.querySelector("#status").style.color = "yellow";
+      await downloadPlatform(config.target, config.arch, sdk);
     }
 
     var src = path.join(process.cwd(), config.source);
@@ -601,9 +635,9 @@
   </body>
 </html>`;
 
-    if (config.target.match(/^(windows|linux|macos)-app$/)) {
+    if (config.target.match(/^(windows|linux|macos)-app$/) || config.target == "iso") {
       var systemPackage = {
-        "name": name,
+        name,
         "version": system.version ? `${system.version.startsWith("v") ? "" : "v"}${system.version}` : "v0.0.1",
         "main": "index.html",
         "chromium-args": "--allow-file-access-from-files --allow-file-access --ignore-certificate-errors --allow-running-insecure-content",
@@ -611,7 +645,7 @@
           "icon": (system.logo ? `./${(config.target == "macos-app") ? "../../../../" : ""}fs${system.logo}` : "./catcore.png")
         }
       };
-      if (!config.windowed) {
+      if (!config.windowed || config.target == "iso") {
         systemPackage.window.kiosk = true;
       }
       fs.writeFileSync(path.join(dist, "package.json"), JSON.stringify(systemPackage, null, 2));
@@ -786,11 +820,31 @@
       }
     }
 
+    if (config.target == "iso") {
+      document.querySelector("#status").innerText = text("packaging_iso");
+      document.querySelector("#status").style.color = "yellow";
+      fs.mkdirSync(path.join(process.cwd(), "dist", "iso"));
+      ["fs", "node_modules", "index.html", "package.json"].forEach(element => {
+        fs.renameSync(path.join(process.cwd(), "dist", element), path.join(process.cwd(), "dist", "iso", element));
+      });
+      fs.copyFileSync(path.join(process.cwd(), "platforms", `base-${config.arch}.iso`), path.join(process.cwd(), "dist", "base.iso"));
+      await new Promise(res => child_process.exec(`xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
+        "cwd": path.join(process.cwd(), "dist")
+      }, res));
+      fs.rmSync(path.join(process.cwd(), "dist", "iso"), {
+        "recursive": true,
+        "force": true
+      });
+      fs.unlinkSync(path.join(process.cwd(), "dist", "base.iso"));
+    }
+
     document.querySelector("#status").innerText = text("ready");
     document.querySelector("#status").style.color = "lime";
     compiling = false;
     document.querySelector("#compile").classList.remove("disabled");
-    document.querySelector("#quick").disabled = false;
+    if (config.target != "iso") {
+      document.querySelector("#quick").disabled = false;
+    }
   }
 
   window.start = () => {
@@ -1021,7 +1075,7 @@
               <option value="windows-app">${text("windows_app")}</option>
               <option value="linux-app">${text("linux_app")}</option>
               <option value="macos-app">${text("macos_app")}</option>
-              <option value="iso" disabled>${text("bootable_iso")}</option>
+              <option value="iso">${text("bootable_iso")}</option>
             </select>
             <br />
             <label><input type="checkbox" id="windowed"> ${text("windowed")}</label>
@@ -1056,6 +1110,11 @@
     document.querySelector("#source").value = config.source;
     document.querySelector("#target").value = config.target;
     document.querySelector("#windowed").checked = config.windowed;
+    if (config.target == "iso") {
+      document.querySelector("#windowed").disabled = true;
+      document.querySelector("#windowed").checked = false;
+      document.querySelector("#sdk").disabled = true;
+    }
 
     // Disable quick mode when kernel/arch/target/sdk was changed
     function disableQuick() {
@@ -1064,7 +1123,16 @@
     }
     document.querySelector("#kernels").addEventListener("change", disableQuick);
     document.querySelector("#arch").addEventListener("change", disableQuick);
-    document.querySelector("#target").addEventListener("change", disableQuick);
+    document.querySelector("#target").addEventListener("change", () => {
+      disableQuick();
+      var isIso = (document.querySelector("#target").value == "iso");
+      document.querySelector("#windowed").disabled = isIso;
+      document.querySelector("#sdk").disabled = isIso;
+      if (isIso) {
+        document.querySelector("#windowed").checked = false;
+        document.querySelector("#sdk").checked = false;
+      }
+    });
     document.querySelector("#sdk").addEventListener("change", disableQuick);
   }
 
