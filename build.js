@@ -608,7 +608,7 @@
         "main": "index.html",
         "chromium-args": "--allow-file-access-from-files --allow-file-access --ignore-certificate-errors --allow-running-insecure-content",
         "window": {
-          "icon": (system.logo ? `./${(config.target == "macos-app") ? "../../../../" : ""}fs/system/${system.logo}` : "./catcore.png")
+          "icon": (system.logo ? `./${(config.target == "macos-app") ? "../../../../" : ""}fs${system.logo}` : "./catcore.png")
         }
       };
       if (!config.windowed) {
