@@ -437,11 +437,20 @@
       });
     }
 
-    // If target is an iso, download base iso
+    // If target is an iso, download base iso and Xorriso (if windows)
     if (config.target == "iso") {
       document.querySelector("#status").innerText = text("downloading");
       document.querySelector("#status").style.color = "yellow";
       await downloadPlatform(config.target, config.arch, sdk);
+
+      if (process.platform == "win32" && !fs.existsSync(path.join(process.cwd(), "xorriso"))) {
+        fs.writeFileSync(path.join(process.cwd(), "xorriso.zip"), Buffer.from(await fetch("https://github.com/CatCoreV/os-compiler/releases/download/iso/xorriso-windows.zip").then(res => res.arrayBuffer())));
+        fs.mkdirSync(path.join(process.cwd(), "xorriso"));
+        child_process.exec("tar -xf ../xorriso.zip", {
+          "cwd": path.join(process.cwd(), "xorriso")
+        }, res);
+        fs.unlinkSync(path.join(process.cwd(), "xorriso.zip"));
+      }
     }
 
     var src = path.join(process.cwd(), config.source);
@@ -834,7 +843,7 @@
         fs.renameSync(path.join(process.cwd(), "dist", element), path.join(process.cwd(), "dist", "iso", element));
       });
       fs.copyFileSync(path.join(process.cwd(), "platforms", `base-${config.arch}.iso`), path.join(process.cwd(), "dist", "base.iso"));
-      var xorrisoLog = await new Promise(res => child_process.exec(`xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
+      var xorrisoLog = await new Promise(res => child_process.exec(`${process.platform == "win32" ? "xorriso/" : ""}xorriso -no_rc -abort_on FAILURE -return_with SORRY 32 -local_charset UTF-8 -indev base.iso -outdev ${name}-${config.arch}.iso -boot_image any replay -joliet on -update_r iso /catcore -chown_r 1000 /catcore -- -chgrp_r 1000 /catcore -- -commit -end`, {
         "cwd": path.join(process.cwd(), "dist")
       }, res));
       if (!fs.existsSync(path.join(process.cwd(), "dist", `${name}-${config.arch}.iso`))) {
