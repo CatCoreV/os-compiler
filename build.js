@@ -1023,8 +1023,6 @@
               <option value="linux-app">${text("linux_app")}</option>
               <option value="macos-app">${text("macos_app")}</option>
               <option value="iso" disabled>${text("bootable_iso")}</option>
-              <option value="milkv-duos-sd" disabled>Milk-V Duo S (SD)</option>
-              <option value="milkv-duos-emmc" disabled>Milk-V Duo S (EMMC)</option>
             </select>
             <br />
             <label><input type="checkbox" id="windowed"> ${text("windowed")}</label>
