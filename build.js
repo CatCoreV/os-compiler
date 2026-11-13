@@ -8,10 +8,11 @@
     [["pl", "pl_PL"], "pl"],
     ["en"]
   ];
+  var hostArch = (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64");
   var config = {
     "language": supportedLanguages.find(lang => (lang.length < 2 || lang[0].includes(navigator.language))).at(-1),
     "kernel": "Unknown",
-    "arch": (["x64", "ia32", "arm", "arm64"].includes(process.arch) ? process.arch.replace(/^arm$/, "arm64") : "x64"),
+    "arch": hostArch,
     "source": "src",
     "target": `${(process.platform == "win32") ? "windows" : ((process.platform == "darwin") ? "macos" : "linux")}-app`,
     "windowed": false
@@ -33,6 +34,7 @@
   }
 
   var compiling = false;
+  var qemuProcess = null;
   var targetMappings = {
     "windows-app": "w",
     "linux-app": "n",
@@ -938,6 +940,42 @@
       });
       document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
+    } else if (config.target == "iso") {
+      var type = (config.arch == "arm64" ? "aarch64" : "x86_64");
+      var args = ["-m", "2G", "-cdrom", `dist/${name}-${config.arch}.iso`];
+      if (config.arch == "x64") {
+        args.push("-M", "q35");
+        args.push("-bios", "/usr/share/edk2/x64/OVMF.4m.fd");
+      } else {
+        args.push("-M", "virt");
+        args.push("-bios", "/usr/share/edk2/aarch64/QEMU_EFI.fd");
+        args.push("-cpu", "cortex-a72");
+        args.push("-device", "virtio-gpu-pci");
+      }
+      if (config.arch == hostArch) {
+        args.push("-enable-kvm");
+      }
+      var opts = {
+        "detached": true
+      };
+      if (process.platform == "win32") {
+        qemuProcess = child_process.spawn(`qemu-system-${type}w.exe`, args, opts);
+      } else if (process.platform == "darwin") {
+        // MacOS has issues with process.env.PATH, so the binary can't be found by itself
+        // Instead, probe two most common paths for a normal homebrew install of QEMU
+        // If both fail, at least try to launch and hope it's in process.env.PATH
+        if (fs.existsSync(`/opt/homebrew/bin/qemu-system-${type}`)) {
+          qemuProcess = child_process.spawn(`/opt/homebrew/bin/qemu-system-${type}`, args, opts);
+        } else if (fs.existsSync(`/usr/local/bin/qemu-system-${type}`)) {
+          qemuProcess = child_process.spawn(`/usr/local/bin/qemu-system-${type}`, args, opts);
+        } else {
+          qemuProcess = child_process.spawn(`qemu-system-${type}`, args, opts);
+        }
+      } else {
+        qemuProcess = child_process.spawn(`qemu-system-${type}`, args, opts);
+      }
+      qemuProcess.stdout.on("data", console.log);
+      qemuProcess.stderr.on("data", console.error);
     }
   };
 
@@ -1006,6 +1044,9 @@
       child_process.exec(`kill -9 $(ps -eo pid,command | grep 'dist/${name}.app/Contents/MacOS/nwjs' | grep -v grep | awk '{print $1}')`);
       document.querySelector("#status").innerText = text("ready");
       document.querySelector("#status").style.color = "lime";
+    } else if (config.target == "iso" && qemuProcess) {
+      qemuProcess.kill("SIGKILL");
+      qemuProcess = null;
     }
   };
 
