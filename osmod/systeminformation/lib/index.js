@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------------
 // Description:   System Information - library
 //                for Node.js
-// Copyright:     (c) 2014 - 2025
+// Copyright:     (c) 2014 - 2026
 // Author:        Sebastian Hildebrandt
 // ----------------------------------------------------------------------------------
 // Contributors:  Guillaume Legrain (https://github.com/glegrain)
@@ -42,12 +42,12 @@ const usb = require('./usb');
 const audio = require('./audio');
 const bluetooth = require('./bluetooth');
 
-let _platform = process.platform;
-const _windows = (_platform === 'win32');
-const _freebsd = (_platform === 'freebsd');
-const _openbsd = (_platform === 'openbsd');
-const _netbsd = (_platform === 'netbsd');
-const _sunos = (_platform === 'sunos');
+const _platform = process.platform;
+const _windows = _platform === 'win32';
+const _freebsd = _platform === 'freebsd';
+const _openbsd = _platform === 'openbsd';
+const _netbsd = _platform === 'netbsd';
+const _sunos = _platform === 'sunos';
 
 // ----------------------------------------------------------------------------------
 // init
@@ -74,11 +74,10 @@ function version() {
 // get static data - they should not change until restarted
 
 function getStaticData(callback) {
-
+  callback = util.isFunction(callback) ? callback : null;
   return new Promise((resolve) => {
     process.nextTick(() => {
-
-      let data = {};
+      const data = {};
 
       data.version = version();
 
@@ -99,7 +98,7 @@ function getStaticData(callback) {
         audio.audio(),
         bluetooth.bluetoothDevices(),
         usb.usb(),
-        printer.printer(),
+        printer.printer()
       ]).then((res) => {
         data.system = res[0];
         data.bios = res[1];
@@ -118,13 +117,14 @@ function getStaticData(callback) {
         data.bluetooth = res[14];
         data.usb = res[15];
         data.printer = res[16];
-        if (callback) { callback(data); }
+        if (callback) {
+          callback(data);
+        }
         resolve(data);
       });
     });
   });
 }
-
 
 // --------------------------
 // get all dynamic data - e.g. for monitoring agents
@@ -135,7 +135,7 @@ function getStaticData(callback) {
 // - iface:	define network interface for which you like to monitor network speed e.g. "eth0"
 
 function getDynamicData(srv, iface, callback) {
-
+  callback = util.isFunction(callback) ? callback : null;
   if (util.isFunction(iface)) {
     callback = iface;
     iface = '';
@@ -147,18 +147,23 @@ function getDynamicData(srv, iface, callback) {
 
   return new Promise((resolve) => {
     process.nextTick(() => {
-
       iface = iface || network.getDefaultNetworkInterface();
       srv = srv || '';
 
       // use closure to track ƒ completion
-      let functionProcessed = (function () {
+      const functionProcessed = (() => {
         let totalFunctions = 15;
-        if (_windows) { totalFunctions = 13; }
-        if (_freebsd || _openbsd || _netbsd) { totalFunctions = 11; }
-        if (_sunos) { totalFunctions = 6; }
+        if (_windows) {
+          totalFunctions = 13;
+        }
+        if (_freebsd || _openbsd || _netbsd) {
+          totalFunctions = 11;
+        }
+        if (_sunos) {
+          totalFunctions = 6;
+        }
 
-        return function () {
+        return () => {
           if (--totalFunctions === 0) {
             if (callback) {
               callback(data);
@@ -168,7 +173,7 @@ function getDynamicData(srv, iface, callback) {
         };
       })();
 
-      let data = {};
+      const data = {};
 
       // get time
       data.time = osInfo.time();
@@ -286,7 +291,7 @@ function getDynamicData(srv, iface, callback) {
 // - iface:	define network interface for which you like to monitor network speed e.g. "eth0"
 
 function getAllData(srv, iface, callback) {
-
+  callback = util.isFunction(callback) ? callback : null;
   return new Promise((resolve) => {
     process.nextTick(() => {
       let data = {};
@@ -305,12 +310,14 @@ function getAllData(srv, iface, callback) {
       getStaticData().then((res) => {
         data = res;
         getDynamicData(srv, iface).then((res) => {
-          for (let key in res) {
+          for (const key in res) {
             if ({}.hasOwnProperty.call(res, key)) {
               data[key] = res[key];
             }
           }
-          if (callback) { callback(data); }
+          if (callback) {
+            callback(data);
+          }
           resolve(data);
         });
       });
@@ -319,26 +326,31 @@ function getAllData(srv, iface, callback) {
 }
 
 function get(valueObject, callback) {
+  callback = util.isFunction(callback) ? callback : null;
   return new Promise((resolve) => {
     process.nextTick(() => {
+      valueObject = valueObject || {};
+      const blocked = ['get', 'getStaticData', 'getDynamicData', 'getAllData', 'observe', 'powerShellStart', 'powerShellRelease'];
+      const isGettable = (key) => ({}).hasOwnProperty.call(exports, key) && typeof exports[key] === 'function' && typeof valueObject[key] === 'string' && blocked.indexOf(key) < 0;
       const allPromises = Object.keys(valueObject)
-        .filter(func => ({}.hasOwnProperty.call(exports, func)))
-        .map(func => {
+        .filter((func) => isGettable(func))
+        .map((func) => {
           const params = valueObject[func].substring(valueObject[func].lastIndexOf('(') + 1, valueObject[func].lastIndexOf(')'));
           let funcWithoutParams = func.indexOf(')') >= 0 ? func.split(')')[1].trim() : func;
           funcWithoutParams = func.indexOf('|') >= 0 ? func.split('|')[0].trim() : funcWithoutParams;
-          if (params) {
-            return exports[funcWithoutParams](params);
-          } else {
-            return exports[funcWithoutParams]('');
+          // a failing function yields an empty result for its key only
+          try {
+            return Promise.resolve(exports[funcWithoutParams](params || '')).catch(() => null);
+          } catch {
+            return Promise.resolve(null);
           }
         });
 
       Promise.all(allPromises).then((data) => {
         const result = {};
         let i = 0;
-        for (let key in valueObject) {
-          if ({}.hasOwnProperty.call(valueObject, key) && {}.hasOwnProperty.call(exports, key) && data.length > i) {
+        for (const key in valueObject) {
+          if ({}.hasOwnProperty.call(valueObject, key) && isGettable(key) && data.length > i) {
             if (valueObject[key] === '*' || valueObject[key] === 'all') {
               result[key] = data[i];
             } else {
@@ -361,12 +373,12 @@ function get(valueObject, callback) {
                 if (Array.isArray(data[i])) {
                   // result is in an array, go through all elements of array and pick only the right ones
                   const partialArray = [];
-                  data[i].forEach(element => {
+                  data[i].forEach((element) => {
                     let partialRes = {};
                     if (keys.length === 1 && (keys[0] === '*' || keys[0] === 'all')) {
                       partialRes = element;
                     } else {
-                      keys.forEach(k => {
+                      keys.forEach((k) => {
                         if ({}.hasOwnProperty.call(element, k)) {
                           partialRes[k] = element[k];
                         }
@@ -376,11 +388,11 @@ function get(valueObject, callback) {
                     if (filter && filterParts.length === 2) {
                       if ({}.hasOwnProperty.call(partialRes, filterParts[0].trim())) {
                         const val = partialRes[filterParts[0].trim()];
-                        if (typeof val == 'number') {
+                        if (typeof val === 'number') {
                           if (val === parseFloat(filterParts[1].trim())) {
                             partialArray.push(partialRes);
                           }
-                        } else if (typeof val == 'string') {
+                        } else if (typeof val === 'string') {
                           if (val.toLowerCase() === filterParts[1].trim().toLowerCase()) {
                             partialArray.push(partialRes);
                           }
@@ -389,12 +401,11 @@ function get(valueObject, callback) {
                     } else {
                       partialArray.push(partialRes);
                     }
-
                   });
                   result[key] = partialArray;
                 } else {
                   const partialRes = {};
-                  keys.forEach(k => {
+                  keys.forEach((k) => {
                     if ({}.hasOwnProperty.call(data[i], k)) {
                       partialRes[k] = data[i][k];
                     }
@@ -408,7 +419,9 @@ function get(valueObject, callback) {
             i++;
           }
         }
-        if (callback) { callback(result); }
+        if (callback) {
+          callback(result);
+        }
         resolve(result);
       });
     });
@@ -416,6 +429,12 @@ function get(valueObject, callback) {
 }
 
 function observe(valueObject, interval, callback) {
+  callback = util.isFunction(callback) ? callback : null;
+  if (!callback) {
+    return null;
+  }
+  // setInterval falls back to 1 ms above this max
+  interval = Math.min(Math.max(Number(interval) || 0, 500), 2147483647);
   let _data = null;
 
   const result = setInterval(() => {
